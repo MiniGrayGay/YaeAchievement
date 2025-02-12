@@ -488,8 +488,16 @@ namespace
 				immValue = static_cast<uint32_t>(i.Operands[1].imm.value.u);
 			}
 
-			if (i.Instruction.meta.branch_type == ZYDIS_BRANCH_TYPE_NEAR && i.Operands.size() == 1) {
+			if (i.Instruction.meta.branch_type == ZYDIS_BRANCH_TYPE_NEAR && i.Operands.size() == 1 &&
+				(i.Instruction.mnemonic == ZYDIS_MNEMONIC_JZ || i.Instruction.mnemonic == ZYDIS_MNEMONIC_JNZ)) // jz for true branch, jnz for false branch
+			{
+				// assume the branching is jz
 				uintptr_t branchAddr = Globals::BaseAddress + i.RVA + i.Instruction.length + i.Operands[0].imm.value.s;
+
+				// check if the branch is jnz and adjust the branch address
+				if (i.Instruction.mnemonic == ZYDIS_MNEMONIC_JNZ) {
+					branchAddr = Globals::BaseAddress + i.RVA + i.Instruction.length;
+				}
 
 				// decode the branch address immediately
 				const auto instructions = DecodeFunction(branchAddr, 10);
