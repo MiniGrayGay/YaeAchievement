@@ -2,6 +2,8 @@ name: YaeLib NuGet Publish
 
 on:
   workflow_dispatch:
+  release:
+    types: [released]
 
 jobs:
   publish:
