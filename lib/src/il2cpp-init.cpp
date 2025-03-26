@@ -343,7 +343,7 @@ namespace
 		for (const auto& [entry, count] : callCounts)
 		{
 			std::println("Entry: 0x{:X}, RVA: 0x{:08X}, Count: {}", entry, entry - Globals::BaseAddress, count);
-			if (count == 5) {
+			if (count == 3) {
 				targetEntry = entry;
 			}
 		}
@@ -367,43 +367,18 @@ namespace
 			mov rax
 		*/
 
-		// look for ItemModule.GetBagManagerByStoreType
-		const auto candidates = Util::PatternScanAll(il2cppSection, "41 83 F8 02 74 ? 41 83 F8 01 48 8B 05");
+		// look for ItemModule.GetBagManagerByStoreType <- mf got inlined in 5.5
+		// we just gon to look for OnPlayerStoreNotify
+		const auto candidates = Util::PatternScanAll(il2cppSection, "41 83 F8 02 ? ? ? ? ? ? ? ? ? ? ? ? ? ? 41 83 F8 01");
 		std::println("Candidates: {}", candidates.size());
 		if (candidates.empty())
 			return;
 
-		uintptr_t pGetBagManagerByStoreType = candidates.front();
-		{
-			std::println("GetBagManagerByStoreType: 0x{:X}", pGetBagManagerByStoreType);
-
-			const auto isFunctionEntry = [](uintptr_t va) -> bool {
-				auto* code = reinterpret_cast<uint8_t*>(va);
-				return (va % 16 == 0 &&
-					code[0] == 0x56 && // push rsi
-					code[1] == 0x57);  // push rdi
-			};
-
-			auto range = std::views::iota(0, 213);
-			if (const auto it = std::ranges::find_if(range, [&](int i) { return isFunctionEntry(pGetBagManagerByStoreType - i); });
-				it != range.end())
-			{
-				pGetBagManagerByStoreType -= *it;
-			}
-			else {
-				std::println("Failed to find function entry");
-				return;
-			}
-
-			std::println("GetBagManagerByStoreType: 0x{:X}", pGetBagManagerByStoreType);
-		}
-
-
 		uintptr_t pOnPlayerStoreNotify = 0;
 		{
-			// get all calls to GetBagManagerByStoreType
-			auto calls = GetCalls(reinterpret_cast<uint8_t*>(pGetBagManagerByStoreType));
-			auto decodedInstructions = calls | std::views::transform([](auto va) { return DecodeFunction(va); });
+			// one of the candidates is OnPlayerStoreNotify
+			// search after the pattern to find an arbirary branch
+			auto decodedInstructions = candidates | std::views::transform([](auto va) { return DecodeFunction(va, 20); });
 
 			// find the call site with an arbitrary branch (JMP or CALL) after the call
 			auto targetInstructions = std::ranges::find_if(decodedInstructions, [](const auto& instr) {
