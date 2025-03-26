@@ -2,7 +2,7 @@
 using Google.Protobuf;
 using Proto;
 
-namespace YaeAchievement;
+namespace YaeAchievement.Utilities;
 
 public class CacheFile(string identifier) {
 

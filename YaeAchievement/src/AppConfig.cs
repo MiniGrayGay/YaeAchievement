@@ -1,11 +1,14 @@
 ﻿using System.Text.RegularExpressions;
 using YaeAchievement.res;
+using YaeAchievement.Utilities;
 
 namespace YaeAchievement;
 
 public static partial class AppConfig {
 
     public static string GamePath { get; private set; } = null!;
+
+    private static readonly string[] ProductNames = [ "原神", "Genshin Impact" ];
 
     internal static void Load(string argumentPath) {
         if (argumentPath != "auto" && File.Exists(argumentPath)) {
@@ -21,25 +24,16 @@ public static partial class AppConfig {
             }
         }
         var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        var cnLogPath = Path.Combine(appDataPath, @"..\LocalLow\miHoYo\原神\output_log.txt");
-        var osLogPath = Path.Combine(appDataPath, @"..\LocalLow\miHoYo\Genshin Impact\output_log.txt");
-        if (!File.Exists(cnLogPath) && !File.Exists(osLogPath)) {
+        var logPath = ProductNames
+            .Select(name => $"{appDataPath}/../LocalLow/miHoYo/{name}/output_log.txt")
+            .Where(File.Exists)
+            .MaxBy(File.GetLastWriteTime);
+        if (logPath == null) {
             throw new ApplicationException(App.ConfigNeedStartGenshin);
         }
-        string finalLogPath;
-        if (!File.Exists(osLogPath)) {
-            finalLogPath = cnLogPath;
-        } else if (!File.Exists(cnLogPath)) {
-            finalLogPath = osLogPath;
-        } else {
-            var cnLastWriteTime = File.GetLastWriteTime(cnLogPath);
-            var osLastWriteTime = File.GetLastWriteTime(osLogPath);
-            finalLogPath = cnLastWriteTime > osLastWriteTime ? cnLogPath : osLogPath;
-        }
-        GamePath = GetGamePathFromLogFile(finalLogPath)
-                   ?? GetGamePathFromLogFile($"{finalLogPath}.last")
+        GamePath = GetGamePathFromLogFile(logPath)
+                   ?? GetGamePathFromLogFile($"{logPath}.last")
                    ?? throw new ApplicationException(App.ConfigNeedStartGenshin);
-        pathCacheFile.Write(GamePath);
     }
 
     private static string? GetGamePathFromLogFile(string path) {
@@ -51,7 +45,7 @@ public static partial class AppConfig {
         var content = File.ReadAllText(copiedLogFilePath);
         try {
             File.Delete(copiedLogFilePath);
-        } catch (Exception) { /* ignore */}
+        } catch (Exception) { /* ignore */ }
         var matchResult = GamePathRegex().Match(content);
         if (!matchResult.Success) {
             return null;

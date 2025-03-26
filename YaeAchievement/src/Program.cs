@@ -1,56 +1,76 @@
-﻿using System.Text;
+﻿using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.Json;
-using YaeAchievement;
+using Windows.Win32;
+using Windows.Win32.System.Console;
 using YaeAchievement.Parsers;
 using YaeAchievement.res;
 using static YaeAchievement.Utils;
 
-Console.InputEncoding = Encoding.UTF8;
-Console.OutputEncoding = Encoding.UTF8;
+namespace YaeAchievement;
 
-TryDisableQuickEdit();
-InstallExitHook();
-InstallExceptionHook();
+internal static class Program {
 
-CheckSelfIsRunning();
-CheckGenshinIsRunning();
+    public static async Task Main(string[] args) {
 
-Console.WriteLine(@"----------------------------------------------------");
-Console.WriteLine(App.AppBanner, GlobalVars.AppVersionName);
-Console.WriteLine(@"https://github.com/HolographicHat/YaeAchievement");
-Console.WriteLine(@"----------------------------------------------------");
+        if (!new Mutex(true, @"Global\YaeMiku~uwu").WaitOne(0, false)) {
+            Console.WriteLine(App.AnotherInstance);
+            Environment.Exit(302);
+        }
 
-AppConfig.Load(args.GetOrNull(0) ?? "auto");
-Export.ExportTo = ToUIntOrNull(args.GetOrNull(1)) ?? uint.MaxValue;
+        InstallExitHook();
+        InstallExceptionHook();
 
-await CheckUpdate(ToBooleanOrFalse(args.GetOrNull(2)));
+        CheckGenshinIsRunning();
 
-var historyCache = GlobalVars.AchievementDataCache;
+        Console.WriteLine(@"----------------------------------------------------");
+        Console.WriteLine(App.AppBanner, GlobalVars.AppVersionName);
+        Console.WriteLine(@"https://github.com/HolographicHat/YaeAchievement");
+        Console.WriteLine(@"----------------------------------------------------");
 
-AchievementAllDataNotify? data = null;
-try {
-    data = AchievementAllDataNotify.ParseFrom(historyCache.Read().Content.ToByteArray());
-} catch (Exception) { /* ignored */ }
+        AppConfig.Load(args.GetOrNull(0) ?? "auto");
+        Export.ExportTo = ToUIntOrNull(args.GetOrNull(1)) ?? uint.MaxValue;
 
-if (historyCache.LastWriteTime.AddMinutes(60) > DateTime.UtcNow && data != null) {
-    Console.WriteLine(App.UsePreviousData);
-    if (Console.ReadLine()?.ToUpper() is "Y" or "YES") {
-        Export.Choose(data);
-        return;
-    }
-}
+        await CheckUpdate(ToBooleanOrFalse(args.GetOrNull(2)));
 
-StartAndWaitResult(AppConfig.GamePath, new Dictionary<byte, Func<BinaryReader, bool>> {
-    { 1, AchievementAllDataNotify.OnReceive },
-    { 2, PlayerStoreNotify.OnReceive },
-    { 100, PlayerPropNotify.OnReceive },
-}, () => {
+        var historyCache = GlobalVars.AchievementDataCache;
+
+        AchievementAllDataNotify? data = null;
+        try {
+            data = AchievementAllDataNotify.ParseFrom(historyCache.Read().Content.ToByteArray());
+        } catch (Exception) { /* ignored */ }
+
+        if (historyCache.LastWriteTime.AddMinutes(60) > DateTime.UtcNow && data != null) {
+            Console.WriteLine(App.UsePreviousData);
+            if (Console.ReadLine()?.ToUpper() is "Y" or "YES") {
+                Export.Choose(data);
+                return;
+            }
+        }
+
+        StartAndWaitResult(AppConfig.GamePath, new Dictionary<byte, Func<BinaryReader, bool>> {
+            { 1, AchievementAllDataNotify.OnReceive },
+            { 2, PlayerStoreNotify.OnReceive },
+            { 100, PlayerPropNotify.OnReceive },
+        }, () => {
 #if DEBUG
-    PlayerPropNotify.OnFinish();
-    File.WriteAllText("store_data.json", JsonSerializer.Serialize(PlayerStoreNotify.Instance, new JsonSerializerOptions {
-        WriteIndented = true,
-        DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
-    }));
+            PlayerPropNotify.OnFinish();
+            File.WriteAllText("store_data.json", JsonSerializer.Serialize(PlayerStoreNotify.Instance, new JsonSerializerOptions {
+                WriteIndented = true,
+                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+            }));
 #endif
-    AchievementAllDataNotify.OnFinish();
-});
+            AchievementAllDataNotify.OnFinish();
+        });
+    }
+
+    [ModuleInitializer]
+    internal static unsafe void SetupConsole() {
+        var handle = Native.GetStdHandle(STD_HANDLE.STD_INPUT_HANDLE);
+        CONSOLE_MODE mode = default;
+        Native.GetConsoleMode(handle, &mode);
+        Native.SetConsoleMode(handle, mode & ~CONSOLE_MODE.ENABLE_QUICK_EDIT_MODE);
+        Console.InputEncoding = Console.OutputEncoding = Encoding.UTF8;
+    }
+
+}

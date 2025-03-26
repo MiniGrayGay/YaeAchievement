@@ -7,9 +7,9 @@ using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using Windows.Win32;
 using Windows.Win32.Foundation;
-using Windows.Win32.System.Console;
 using Proto;
 using YaeAchievement.res;
+using YaeAchievement.Utilities;
 
 namespace YaeAchievement;
 
@@ -68,8 +68,7 @@ public static class Utils {
     }
 
     public static unsafe void CopyToClipboard(string text) {
-        if (Native.OpenClipboard(HWND.Null))
-        {
+        if (Native.OpenClipboard(HWND.Null)) {
             Native.EmptyClipboard();
             var hGlobal = (HGLOBAL) Marshal.AllocHGlobal((text.Length + 1) * 2);
             var hPtr = (nint) Native.GlobalLock(hGlobal);
@@ -78,9 +77,7 @@ public static class Utils {
             Native.SetClipboardData(13,  new HANDLE(hPtr));
             Marshal.FreeHGlobal(hGlobal);
             Native.CloseClipboard();
-        }
-        else
-        {
+        } else {
             throw new Win32Exception();
         }
     }
@@ -116,20 +113,6 @@ public static class Utils {
         _updateInfo = info;
     }
 
-    public static void CheckSelfIsRunning() {
-        try {
-            Process.EnterDebugMode();
-            var cur = Process.GetCurrentProcess();
-            foreach (var process in Process.GetProcesses().Where(process => process.Id != cur.Id)) {
-                if (process.ProcessName == cur.ProcessName) {
-                    Console.WriteLine(App.AnotherInstance);
-                    Environment.Exit(302);
-                }
-            }
-            Process.LeaveDebugMode();
-        } catch (Win32Exception) {}
-    }
-
     // ReSharper disable once UnusedMethodReturnValue.Global
     public static bool ShellOpen(string path, string? args = null) {
         try {
@@ -146,13 +129,6 @@ public static class Utils {
         } catch (Exception) {
             return false;
         }
-    }
-
-    // ReSharper disable once UnusedMethodReturnValue.Global
-    public static unsafe bool TryDisableQuickEdit() {
-        var handle = Native.GetStdHandle(STD_HANDLE.STD_INPUT_HANDLE);
-        CONSOLE_MODE mode = default;
-        return Native.GetConsoleMode(handle, &mode) && Native.SetConsoleMode(handle, mode & ~CONSOLE_MODE.ENABLE_QUICK_EDIT_MODE);
     }
 
     public static void CheckGenshinIsRunning() {
