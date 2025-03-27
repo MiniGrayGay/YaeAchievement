@@ -9,11 +9,11 @@ Click on the file named "YaeAchievement.exe" in the red box to automatically pop
 
 ![Step1](https://github.com/user-attachments/assets/dbe32d1f-3a73-4948-b854-1fb6151ad7f3)
 
-2.Install .NET Runtime 7 (this step can be ignored if the runtime is already installed)
+2.Install .NET Runtime 9 (this step can be ignored if the runtime is already installed)
 
-Click Here：https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-8.0.4-windows-x64-installer .
+Click Here：https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-9.0.3-windows-x64-installer .
 
-Or `winget install Microsoft.DotNet.Runtime.7` if you use Windows 11 or have Winget installed.
+Or `winget install Microsoft.DotNet.Runtime.9` if you use Windows 11 or have Winget installed.
 
 The browser automatically pops up and downloads when you enter the web page, as well as saving files in a desktop or other easy-to-see folder.
 

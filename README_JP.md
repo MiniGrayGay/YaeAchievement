@@ -36,7 +36,7 @@
 
 ## よくある質問
 0. Q: 起動できない   
-   A: [.NET Runtime 7](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-8.0.4-windows-x64-installer) をダウンロードしてインストールするか、`winget install Microsoft.DotNet.Runtime.8` を実行してください。
+   A: [.NET Runtime 9](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-9.0.3-windows-x64-installer) をダウンロードしてインストールするか、`winget install Microsoft.DotNet.Runtime.9` を実行してください。
  
 
 1. Q: 原神を起動中にエラーが発生しました: データ例外 (31-4302)   

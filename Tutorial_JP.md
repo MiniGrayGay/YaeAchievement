@@ -8,11 +8,11 @@
 
 ![Guide1](https://github.com/user-attachments/assets/dbe32d1f-3a73-4948-b854-1fb6151ad7f3)
 
-2. .NET Runtime 7をインストール（ランタイムが既にインストールされている場合はこのステップを無視できます）
+2. .NET Runtime 9をインストール（ランタイムが既にインストールされている場合はこのステップを無視できます）
 
-こちらをクリック：https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-8.0.4-windows-x64-installer .
+こちらをクリック：https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-9.0.3-windows-x64-installer .
 
-または、Windows 11を使用しているか、Wingetがインストールされている場合は、`winget install Microsoft.DotNet.Runtime.7`を実行します。
+または、Windows 11を使用しているか、Wingetがインストールされている場合は、`winget install Microsoft.DotNet.Runtime.9`を実行します。
 
 ウェブページにアクセスすると、ブラウザが自動的にポップアップしてダウンロードされます。ファイルをデスクトップや他の見やすいフォルダに保存します。
 
