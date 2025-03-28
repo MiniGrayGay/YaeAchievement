@@ -242,7 +242,8 @@ BOOL __stdcall DllMain(HMODULE hInstance, DWORD fdwReason, LPVOID lpReserved)
 	WCHAR szFileName[MAX_PATH]{};
 	DWORD length = 0;
 	GetModuleFileNameW(NULL, szFileName, MAX_PATH);
-	if (!(wcsstr(szFileName, L"YuanShen.exe") || wcsstr(szFileName, L"GenshinImpact.exe")))
+	CharUpperBuffW(szFileName, wcslen(szFileName));
+	if (!(wcsstr(szFileName, L"YUANSHEN.EXE") || wcsstr(szFileName, L"GENSHINIMPACT.EXE")))
 	{
 		return TRUE;
 	}
