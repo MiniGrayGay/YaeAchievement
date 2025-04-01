@@ -95,7 +95,7 @@ public static class Export {
     private static void ToTeyvatGuide(AchievementAllDataNotify data) {
         if (Process.GetProcessesByName("TeyvatGuide").Length != 0) {
             Utils.CopyToClipboard(UIAFSerializer.Serialize(data));
-            Utils.ShellOpen("teyvatguide://import_uigf?app=YaeAchievement");
+            Utils.ShellOpen("teyvatguide://import_uiaf?app=Yae");
             Console.WriteLine(App.ExportToTauriSuccess);
         } else {
             Console.WriteLine(App.ExportToTauriFail);
