@@ -18,6 +18,8 @@
         <PublishReadyToRun>true</PublishReadyToRun>
         <RuntimeIdentifier>win-x64</RuntimeIdentifier>
 
+        <CETCompat>false</CETCompat>
+
     </PropertyGroup>
 
     <ItemGroup>
