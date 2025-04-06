@@ -32,7 +32,7 @@
 [releases/latest](https://github.com/HolographicHat/YaeAchievement/releases/latest)
 
 ## 问题反馈
-[issues](https://github.com/HolographicHat/YaeAchievement/issues)或[QQ群: 913777414](https://qm.qq.com/cgi-bin/qm/qr?k=9UGz-chQVTjZa4b82RA_A41vIcBVNpms&jump_from=webapi)
+[issues](https://github.com/HolographicHat/YaeAchievement/issues)或[QQ群: 598720036](https://qm.qq.com/cgi-bin/qm/qr?k=9UGz-chQVTjZa4b82RA_A41vIcBVNpms&jump_from=webapi)
 
 ## 常见问题
 0. Q: 打不开   

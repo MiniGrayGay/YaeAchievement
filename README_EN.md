@@ -32,7 +32,7 @@
 ## Download: [Here](https://github.com/HolographicHat/YaeAchievement/releases/latest)
 
 ## Feedback or Problem?
-[issues](https://github.com/HolographicHat/YaeAchievement/issues) or [QQ群: 913777414](https://qm.qq.com/cgi-bin/qm/qr?k=9UGz-chQVTjZa4b82RA_A41vIcBVNpms&jump_from=webapi)
+[issues](https://github.com/HolographicHat/YaeAchievement/issues) or [QQ群: 598720036](https://qm.qq.com/cgi-bin/qm/qr?k=9UGz-chQVTjZa4b82RA_A41vIcBVNpms&jump_from=webapi)
 
 ## Frequently asked questions
 0. Q: Unable to start   
