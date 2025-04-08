@@ -52,6 +52,7 @@ public static class Export {
         var responseText = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
         var responseJson = JsonSerializer.Deserialize(responseText, CocogoatResponseContext.Default.CocogoatResponse)!;
         var cocogoatUrl = $"https://cocogoat.work/achievement?memo={responseJson.Key}";
+        Utils.SetQuickEditMode(true);
         Console.WriteLine(cocogoatUrl);
         if (Utils.ShellOpen(cocogoatUrl))
         {

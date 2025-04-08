@@ -1,8 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Text;
-using System.Text.Json;
-using Windows.Win32;
-using Windows.Win32.System.Console;
 using YaeAchievement.Parsers;
 using YaeAchievement.res;
 using YaeAchievement.Utilities;
@@ -68,11 +65,8 @@ internal static class Program {
     }
 
     [ModuleInitializer]
-    internal static unsafe void SetupConsole() {
-        var handle = Native.GetStdHandle(STD_HANDLE.STD_INPUT_HANDLE);
-        CONSOLE_MODE mode = default;
-        Native.GetConsoleMode(handle, &mode);
-        Native.SetConsoleMode(handle, mode & ~CONSOLE_MODE.ENABLE_QUICK_EDIT_MODE);
+    internal static void SetupConsole() {
+        SetQuickEditMode(false);
         Console.InputEncoding = Console.OutputEncoding = Encoding.UTF8;
     }
 

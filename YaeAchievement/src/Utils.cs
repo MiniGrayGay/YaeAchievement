@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using Windows.Win32;
 using Windows.Win32.Foundation;
+using Windows.Win32.System.Console;
 using Proto;
 using YaeAchievement.res;
 using YaeAchievement.Utilities;
@@ -213,5 +214,13 @@ public static class Utils {
                 }
             }
         });
+    }
+
+    public static unsafe void SetQuickEditMode(bool enable) {
+        var handle = Native.GetStdHandle(STD_HANDLE.STD_INPUT_HANDLE);
+        CONSOLE_MODE mode = default;
+        Native.GetConsoleMode(handle, &mode);
+        mode = enable ? mode | CONSOLE_MODE.ENABLE_QUICK_EDIT_MODE : mode &~CONSOLE_MODE.ENABLE_QUICK_EDIT_MODE;
+        Native.SetConsoleMode(handle, mode);
     }
 }
