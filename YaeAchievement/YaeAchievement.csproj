@@ -23,42 +23,36 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Google.Protobuf" Version="3.29.0" />
+        <PackageReference Include="Google.Protobuf" Version="3.29.0"/>
         <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.106">
-          <PrivateAssets>all</PrivateAssets>
+            <PrivateAssets>all</PrivateAssets>
         </PackageReference>
         <PackageReference Include="Grpc.Tools" Version="2.67.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Spectre.Console" Version="0.49.1" />
+        <PackageReference Include="Spectre.Console" Version="0.49.1"/>
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Update="res\App.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>App.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
-      <None Remove="res\Updater.exe" />
-      <None Remove="src\NativeMethods.json" />
-      <None Remove="src\NativeMethods.txt" />
-      <AdditionalFiles Include="src\NativeMethods.json" />
-      <AdditionalFiles Include="src\NativeMethods.txt" />
-      <EmbeddedResource Include="res\Updater.exe">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
+        <EmbeddedResource Update="res\App.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>App.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <None Remove="res\updater.exe"/>
+        <EmbeddedResource Include="res\updater.exe" LogicalName="updater"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Update="res\App.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>App.resx</DependentUpon>
-      </Compile>
+        <Compile Update="res\App.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>App.resx</DependentUpon>
+        </Compile>
     </ItemGroup>
 
     <ItemGroup>
-        <Protobuf Include="res/proto/*.proto" ProtoRoot="res/proto" GrpcServices="None" />
+        <Protobuf Include="res/proto/*.proto" ProtoRoot="res/proto" GrpcServices="None"/>
     </ItemGroup>
 
 </Project>

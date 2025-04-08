@@ -48,7 +48,7 @@ internal static class Program {
             }
         }
 
-        StartAndWaitResult(AppConfig.GamePath, new Dictionary<byte, Func<BinaryReader, bool>> {
+        StartAndWaitResult(AppConfig.GamePath, new Dictionary<int, Func<BinaryReader, bool>> {
             { 1, AchievementAllDataNotify.OnReceive },
             { 2, PlayerStoreNotify.OnReceive },
             { 100, PlayerPropNotify.OnReceive },
@@ -61,7 +61,9 @@ internal static class Program {
             }));
 #endif
             AchievementAllDataNotify.OnFinish();
+            Environment.Exit(0);
         });
+        while (true) {}
     }
 
     [ModuleInitializer]

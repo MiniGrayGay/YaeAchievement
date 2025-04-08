@@ -94,10 +94,13 @@ public static class Utils {
                 Console.WriteLine(App.UpdateDownloading);
                 var tmpPath = Path.GetTempFileName();
                 await File.WriteAllBytesAsync(tmpPath, await GetBucketFile(info.PackageLink));
-                var updaterArgs = $"{Environment.ProcessId}|{Environment.ProcessPath}|{tmpPath}";
                 var updaterPath = Path.Combine(GlobalVars.DataPath, "update.exe");
-                await File.WriteAllBytesAsync(updaterPath, App.Updater);
-                ShellOpen(updaterPath, updaterArgs.ToBytes().ToBase64());
+                await using (var dstStream = File.Open($"{GlobalVars.DataPath}/update.exe", FileMode.Create)) {
+                    await using var srcStream = typeof(Program).Assembly.GetManifestResourceStream("updater")!;
+                    await srcStream.CopyToAsync(dstStream);
+                }
+                ShellOpen(updaterPath, $"{Environment.ProcessId} \"{tmpPath}\"");
+                await Task.Delay(1919810);
                 GlobalVars.PauseOnExit = false;
                 Environment.Exit(0);
             }
@@ -131,26 +134,24 @@ public static class Utils {
         }
     }
 
-    public static void CheckGenshinIsRunning() {
-        Process.EnterDebugMode();
-        foreach (var process in Process.GetProcesses()) {
-            if (process.ProcessName is "GenshinImpact" or "YuanShen"
-                && !process.HasExited
-                && process.MainWindowHandle != nint.Zero
-            ) {
-                Console.WriteLine(App.GenshinIsRunning, process.Id);
+    internal static void CheckGenshinIsRunning() {
+        // QueryProcessEvent?
+        var appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        foreach (var path in Directory.EnumerateDirectories($"{appdata}/../LocalLow/miHoYo").Where(p => File.Exists($"{p}/info.txt"))) {
+            try {
+                using var handle = File.OpenHandle($"{path}/output_log.txt", share: FileShare.None);
+            } catch (IOException) {
+                Console.WriteLine(App.GenshinIsRunning, 0);
                 Environment.Exit(301);
             }
         }
-        Process.LeaveDebugMode();
     }
 
-    // ReSharper disable once InconsistentNaming
-    private static Process? proc;
+    private static GameProcess? _proc;
 
     public static void InstallExitHook() {
         AppDomain.CurrentDomain.ProcessExit += (_, _) => {
-            proc?.Kill();
+            _proc?.Terminate(0);
             if (GlobalVars.PauseOnExit) {
                 Console.WriteLine(App.PressKeyToExit);
                 Console.ReadKey();
@@ -179,51 +180,27 @@ public static class Utils {
         };
     }
 
-    private static bool _isUnexpectedExit;
+    private static bool _isUnexpectedExit = true;
     
     // ReSharper disable once UnusedMethodReturnValue.Global
-    public static Thread StartAndWaitResult(string exePath, Dictionary<byte, Func<BinaryReader, bool>> handlers, Action onFinish) {
-        if (!Injector.CreateProcess(exePath, out var hProcess, out var hThread, out var pid)) {
-            Environment.Exit(new Win32Exception().PrintMsgAndReturnErrCode("ICreateProcess fail"));
-        }
-        if (Injector.LoadLibraryAndInject(hProcess,GlobalVars.LibFilePath.AsSpan()) != 0)
-        {
-            if (!Native.TerminateProcess(hProcess, 0))
-            {
-                Environment.Exit(new Win32Exception().PrintMsgAndReturnErrCode("TerminateProcess fail"));
-            }
-        }
-        Console.WriteLine(App.GameLoading, pid);
-        proc = Process.GetProcessById(Convert.ToInt32(pid));
-        proc.EnableRaisingEvents = true;
-        proc.Exited += (_, _) => {
-            if (_isUnexpectedExit)
-            {
-                proc = null;
+    public static void StartAndWaitResult(string exePath, Dictionary<int, Func<BinaryReader, bool>> handlers, Action onFinish) {
+        _proc = new GameProcess(exePath);
+        _proc.OnExit += () => {
+            if (_isUnexpectedExit) {
+                _proc = null;
                 Console.WriteLine(App.GameProcessExit);
                 Environment.Exit(114514);
             }
         };
-        if (Native.ResumeThread(hThread) == 0xFFFFFFFF)
-        {
-            var e = new Win32Exception();
-            if (!Native.TerminateProcess(hProcess, 0))
-            {
-                new Win32Exception().PrintMsgAndReturnErrCode("TerminateProcess fail");
-            }
-            Environment.Exit(e.PrintMsgAndReturnErrCode("ResumeThread fail"));
-        }
-        if (!Native.CloseHandle(hProcess))
-        {
-            Environment.Exit(new Win32Exception().PrintMsgAndReturnErrCode("CloseHandle fail"));
-        }
-
-        var ts = new ThreadStart(() => {
-            var server = new NamedPipeServerStream(GlobalVars.PipeName);
-            server.WaitForConnection();
-            using var reader = new BinaryReader(server);
-            while (!proc.HasExited) {
-                var type = reader.ReadByte();
+        _proc.LoadLibrary(GlobalVars.LibFilePath);
+        _proc.ResumeMainThread();
+        Console.WriteLine(App.GameLoading, _proc.Id);
+        Task.Run(() => {
+            using var stream = new NamedPipeServerStream(GlobalVars.PipeName);
+            using var reader = new BinaryReader(stream);
+            stream.WaitForConnection();
+            int type;
+            while ((type = stream.ReadByte()) != -1) {
                 if (type == 0xFF) {
                     _isUnexpectedExit = false;
                     onFinish();
@@ -236,8 +213,5 @@ public static class Utils {
                 }
             }
         });
-        var th = new Thread(ts);
-        th.Start();
-        return th;
     }
 }

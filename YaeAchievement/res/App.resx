@@ -122,9 +122,6 @@ Input a number (0-8): </value>
         <value>Network error ({0}: {1})</value>
     </data>
     <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-    <data name="Updater" type="System.Resources.ResXFileRef, System.Windows.Forms">
-        <value>Updater.exe;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-    </data>
     <data name="GenshinHashError" xml:space="preserve">
         <value>Please update genshin and retry.</value>
     </data>
