@@ -1,39 +1,53 @@
-﻿using System.IO.Compression;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.IO.Compression;
+using System.Security.Cryptography;
+using System.Text;
 using Google.Protobuf;
 using Proto;
 
 namespace YaeAchievement.Utilities;
 
-public class CacheFile(string identifier) {
+public static class CacheFile {
 
-    private readonly string _cacheName = Path.Combine(GlobalVars.CachePath, $"{identifier.MD5Hash()[..16]}.miko");
-    private CacheItem? _content;
-
-    public DateTime LastWriteTime => Exists() ? File.GetLastWriteTimeUtc(_cacheName) : DateTime.UnixEpoch;
-
-    public bool Exists() => File.Exists(_cacheName);
-
-    public CacheItem Read() {
-        if (_content == null) {
-            using var fInput = File.OpenRead(_cacheName);
-            using var dInput = new GZipStream(fInput, CompressionMode.Decompress);
-            _content = CacheItem.Parser.ParseFrom(dInput);
+    static CacheFile() {
+        // remove deprecated cache
+        foreach (var file in Directory.EnumerateFiles(GlobalVars.CachePath, "*.miko")) {
+            File.Delete(file);
         }
-        return _content;
     }
 
-    public void Write(string data, string? etag = null) => Write(ByteString.CopyFromUtf8(data), data.MD5Hash(), etag);
+    public static DateTime GetLastWriteTime(string id) {
+        var fileName = Path.Combine(GlobalVars.CachePath, $"{GetStrHash(id)}.nyan");
+        return File.Exists(fileName) ? File.GetLastWriteTimeUtc(fileName) : DateTime.UnixEpoch;
+    }
 
-    public void Write(byte[] data, string? etag = null) => Write(ByteString.CopyFrom(data), data.MD5Hash(), etag);
+    public static bool TryRead(string id, [NotNullWhen(true)] out CacheItem? item) {
+        item = null;
+        try {
+            var fileName = Path.Combine(GlobalVars.CachePath, $"{GetStrHash(id)}.nyan");
+            using var fileStream = File.OpenRead(fileName);
+            using var zipStream = new GZipStream(fileStream, CompressionMode.Decompress);
+            item = CacheItem.Parser.ParseFrom(zipStream);
+            return true;
+        } catch (Exception) {
+            return false;
+        }
+    }
 
-    private void Write(ByteString data, string hash, string? etag) {
-        using var fOut = File.OpenWrite(_cacheName);
-        using var cOut = new GZipStream(fOut, CompressionLevel.SmallestSize);
+    public static void Write(string id, byte[] data, string? etag = null) {
+        var fileName = Path.Combine(GlobalVars.CachePath, $"{GetStrHash(id)}.nyan");
+        using var fileStream = File.Open(fileName, FileMode.Create);
+        using var zipStream = new GZipStream(fileStream, CompressionLevel.SmallestSize);
         new CacheItem {
             Etag = etag ?? string.Empty,
             Version = 3,
-            Checksum = hash,
-            Content = data
-        }.WriteTo(cOut);
+            Checksum = GetBinHash(data),
+            Content = ByteString.CopyFrom(data)
+        }.WriteTo(zipStream);
     }
+
+    private static string GetStrHash(string value) => GetBinHash(Encoding.UTF8.GetBytes(value));
+
+    private static string GetBinHash(byte[] value) => Convert.ToHexStringLower(MD5.HashData(value));
+
 }

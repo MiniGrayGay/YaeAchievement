@@ -15,9 +15,8 @@ public static partial class AppConfig {
             GamePath = argumentPath;
             return;
         }
-        var pathCacheFile = new CacheFile("genshin_impact_game_path");
-        if (pathCacheFile.Exists()) {
-            var path = pathCacheFile.Read().Content.ToStringUtf8();
+        if (CacheFile.TryRead("genshin_impact_game_path", out var cache)) {
+            var path = cache.Content.ToStringUtf8();
             if (path != null && File.Exists(path)) {
                 GamePath = path;
                 return;
@@ -40,12 +39,7 @@ public static partial class AppConfig {
         if (!File.Exists(path)) {
             return null;
         }
-        var copiedLogFilePath = Path.GetTempFileName();
-        File.Copy(path, copiedLogFilePath, true);
-        var content = File.ReadAllText(copiedLogFilePath);
-        try {
-            File.Delete(copiedLogFilePath);
-        } catch (Exception) { /* ignore */ }
+        var content = File.ReadAllText(path);
         var matchResult = GamePathRegex().Match(content);
         if (!matchResult.Success) {
             return null;
@@ -54,7 +48,7 @@ public static partial class AppConfig {
         return Path.GetFullPath(Path.Combine(matchResult.Value, "..", entryName));
     }
 
-    [GeneratedRegex(@"(?m).:/.+(GenshinImpact_Data|YuanShen_Data)", RegexOptions.IgnoreCase)]
+    [GeneratedRegex(@"(?m).:(?:\\|/).+(GenshinImpact_Data|YuanShen_Data)", RegexOptions.IgnoreCase)]
     private static partial Regex GamePathRegex();
 
 }

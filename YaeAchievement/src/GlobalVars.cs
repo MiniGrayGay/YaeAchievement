@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Proto;
-using YaeAchievement.Utilities;
 
 namespace YaeAchievement;
 
@@ -27,8 +26,6 @@ public static class GlobalVars {
     public const string PipeName = "YaeAchievementPipe";
     public const string RinBucketHost = "https://rin.holohat.work";
     public const string SakuraBucketHost = "https://cn-cd-1259389942.file.myqcloud.com";
-
-    public static CacheFile AchievementDataCache { get; } = new ("achievement_data");
 
     [field:MaybeNull]
     public static AchievementInfo AchievementInfo =>

@@ -5,6 +5,7 @@ using Windows.Win32;
 using Windows.Win32.System.Console;
 using YaeAchievement.Parsers;
 using YaeAchievement.res;
+using YaeAchievement.Utilities;
 using static YaeAchievement.Utils;
 
 namespace YaeAchievement;
@@ -33,14 +34,14 @@ internal static class Program {
 
         await CheckUpdate(ToBooleanOrFalse(args.GetOrNull(2)));
 
-        var historyCache = GlobalVars.AchievementDataCache;
-
         AchievementAllDataNotify? data = null;
         try {
-            data = AchievementAllDataNotify.ParseFrom(historyCache.Read().Content.ToByteArray());
+            if (CacheFile.TryRead("achievement_data", out var cache)) {
+                data = AchievementAllDataNotify.ParseFrom(cache.Content.ToByteArray());
+            }
         } catch (Exception) { /* ignored */ }
 
-        if (historyCache.LastWriteTime.AddMinutes(60) > DateTime.UtcNow && data != null) {
+        if (CacheFile.GetLastWriteTime("achievement_data").AddMinutes(60) > DateTime.UtcNow && data != null) {
             Console.WriteLine(App.UsePreviousData);
             if (Console.ReadLine()?.ToUpper() is "Y" or "YES") {
                 Export.Choose(data);

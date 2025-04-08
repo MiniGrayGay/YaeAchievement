@@ -1,32 +1,30 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <OutputType>Exe</OutputType>
-        <TargetFramework>net9.0-windows</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <OutputType>Exe</OutputType>
         <LangVersion>preview</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <ApplicationManifest>res\app.manifest</ApplicationManifest>
-        <AssemblyVersion>5.3.0</AssemblyVersion>
+        <TargetFramework>net9.0-windows</TargetFramework>
         <FileVersion>5.3.0</FileVersion>
+        <AssemblyVersion>5.3.0</AssemblyVersion>
         <ApplicationIcon>res\icon.ico</ApplicationIcon>
+        <ApplicationManifest>res\app.manifest</ApplicationManifest>
+    </PropertyGroup>
 
-        <DebugType>embedded</DebugType>
-        <SelfContained>false</SelfContained>
-        <PublishSingleFile>true</PublishSingleFile>
-        <PublishReadyToRun>true</PublishReadyToRun>
+    <PropertyGroup>
+        <PublishAot>true</PublishAot>
         <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-
-        <CETCompat>false</CETCompat>
-
+        <IlcOptimizationPreference>Size</IlcOptimizationPreference>
+        <IlcFoldIdenticalMethodBodies>true</IlcFoldIdenticalMethodBodies>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Google.Protobuf" Version="3.29.0"/>
         <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.106">
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
+        <PackageReference Include="Google.Protobuf" Version="3.29.0"/>
         <PackageReference Include="Grpc.Tools" Version="2.67.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -54,5 +52,9 @@
     <ItemGroup>
         <Protobuf Include="res/proto/*.proto" ProtoRoot="res/proto" GrpcServices="None"/>
     </ItemGroup>
+
+    <PropertyGroup>
+        <CETCompat>false</CETCompat>
+    </PropertyGroup>
 
 </Project>

@@ -15,7 +15,7 @@ namespace YaeAchievement;
 
 public static class Utils {
 
-    public static readonly HttpClient CHttpClient = new (new HttpClientHandler {
+    public static HttpClient CHttpClient { get; } = new (new HttpClientHandler {
         AutomaticDecompression = DecompressionMethods.Brotli | DecompressionMethods.GZip
     }) {
         DefaultRequestHeaders = {
@@ -25,7 +25,7 @@ public static class Utils {
         }
     };
 
-    public static async Task<byte[]> GetBucketFile(string path, bool cache = true) {
+    public static async Task<byte[]> GetBucketFile(string path, bool useCache = true) {
         try {
             return await await Task.WhenAny(GetFile(GlobalVars.RinBucketHost), GetFile(GlobalVars.SakuraBucketHost));
         } catch (Exception e) when(e is SocketException or TaskCanceledException) {
@@ -37,19 +37,19 @@ public static class Utils {
             using var msg = new HttpRequestMessage();
             msg.Method = HttpMethod.Get;
             msg.RequestUri = new Uri($"{host}/{path}");
-            var cacheFile = new CacheFile(path);
-            if (cache && cacheFile.Exists()) {
-                msg.Headers.TryAddWithoutValidation("If-None-Match", $"{cacheFile.Read().Etag}");
+            CacheItem? cache = null;
+            if (useCache && CacheFile.TryRead(path, out cache)) {
+                msg.Headers.TryAddWithoutValidation("If-None-Match", $"{cache.Etag}");
             }
             using var response = await CHttpClient.SendAsync(msg);
-            if (cache && response.StatusCode == HttpStatusCode.NotModified) {
-                return cacheFile.Read().Content.ToByteArray();
+            if (cache != null && response.StatusCode == HttpStatusCode.NotModified) {
+                return cache.Content.ToByteArray();
             }
             response.EnsureSuccessStatusCode();
             var responseBytes = await response.Content.ReadAsByteArrayAsync();
-            if (cache) {
+            if (useCache) {
                 var etag = response.Headers.ETag!.Tag;
-                cacheFile.Write(responseBytes, etag);
+                CacheFile.Write(path, responseBytes, etag);
             }
             return responseBytes;
         }
