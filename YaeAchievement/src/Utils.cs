@@ -9,6 +9,7 @@ using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.System.Console;
 using Proto;
+using Spectre.Console;
 using YaeAchievement.res;
 using YaeAchievement.Utilities;
 
@@ -28,31 +29,36 @@ public static class Utils {
 
     public static async Task<byte[]> GetBucketFile(string path, bool useCache = true) {
         try {
-            return await await Task.WhenAny(GetFile(GlobalVars.RinBucketHost), GetFile(GlobalVars.SakuraBucketHost));
-        } catch (Exception e) when(e is SocketException or TaskCanceledException) {
-            Console.WriteLine(App.NetworkError, e.Message);
-            Environment.Exit(-1);
-            return null!;
+            return await GetFile("https://api.qhy04.com/hutaocdn/download?filename={0}", path, useCache);
+        } catch (Exception e) when (e is SocketException or TaskCanceledException or HttpRequestException) {
         }
-        async Task<byte[]> GetFile(string host) {
-            using var msg = new HttpRequestMessage();
-            msg.Method = HttpMethod.Get;
-            msg.RequestUri = new Uri($"{host}/{path}");
+        try {
+            return await Task.WhenAny(
+                GetFile("https://rin.holohat.work/{0}", path, useCache),
+                GetFile("https://cn-cd-1259389942.file.myqcloud.com/{0}", path, useCache)
+            ).Unwrap();
+        } catch (Exception ex) when (ex is SocketException or TaskCanceledException) {
+            AnsiConsole.WriteLine(App.NetworkError, ex.Message);
+            Environment.Exit(-1);
+        }
+        return null!;
+        static async Task<byte[]> GetFile(string baseUrl, string objectKey, bool useCache) {
+            using var reqwest = new HttpRequestMessage(HttpMethod.Get, string.Format(baseUrl, objectKey));
             CacheItem? cache = null;
-            if (useCache && CacheFile.TryRead(path, out cache)) {
-                msg.Headers.TryAddWithoutValidation("If-None-Match", $"{cache.Etag}");
+            if (useCache && CacheFile.TryRead(objectKey, out cache)) {
+                reqwest.Headers.TryAddWithoutValidation("If-None-Match", $"{cache.Etag}");
             }
-            using var response = await CHttpClient.SendAsync(msg);
+            using var response = await CHttpClient.SendAsync(reqwest);
             if (cache != null && response.StatusCode == HttpStatusCode.NotModified) {
                 return cache.Content.ToByteArray();
             }
             response.EnsureSuccessStatusCode();
-            var responseBytes = await response.Content.ReadAsByteArrayAsync();
+            var bytes = await response.Content.ReadAsByteArrayAsync();
             if (useCache) {
                 var etag = response.Headers.ETag!.Tag;
-                CacheFile.Write(path, responseBytes, etag);
+                CacheFile.Write(objectKey, bytes, etag);
             }
-            return responseBytes;
+            return bytes;
         }
     }
 
@@ -60,12 +66,12 @@ public static class Utils {
         return array.Length > index ? array[index] : null;
     }
 
-    public static uint? ToUIntOrNull(string? value) {
-        return value != null ? uint.TryParse(value, out var result) ? result : null : null;
+    public static int ToIntOrDefault(string? value, int defaultValue = 0) {
+        return value != null && int.TryParse(value, out var result) ? result : defaultValue;
     }
 
-    public static bool ToBooleanOrFalse(string? value) {
-        return value != null && bool.TryParse(value, out var result) && result;
+    public static bool ToBooleanOrDefault(string? value, bool defaultValue = false) {
+        return value != null && bool.TryParse(value, out var result) ? result : defaultValue;
     }
 
     public static unsafe void CopyToClipboard(string text) {
@@ -86,35 +92,44 @@ public static class Utils {
     // ReSharper disable once NotAccessedField.Local
     private static UpdateInfo _updateInfo = null!;
 
+    public static Task StartSpinnerAsync(string status, Func<StatusContext, Task> func) {
+        return AnsiConsole.Status().Spinner(Spinner.Known.SimpleDotsScrolling).StartAsync(status, func);
+    }
+
+    public static Task<T> StartSpinnerAsync<T>(string status, Func<StatusContext, Task<T>> func) {
+        return AnsiConsole.Status().Spinner(Spinner.Known.SimpleDotsScrolling).StartAsync(status, func);
+    }
+
     public static async Task CheckUpdate(bool useLocalLib) {
-        var info = UpdateInfo.Parser.ParseFrom(await GetBucketFile("schicksal/version"))!;
-        if (GlobalVars.AppVersionCode < info.VersionCode) {
-            Console.WriteLine(App.UpdateNewVersion, GlobalVars.AppVersionName, info.VersionName);
-            Console.WriteLine(App.UpdateDescription, info.Description);
-            if (info.EnableAutoUpdate) {
-                Console.WriteLine(App.UpdateDownloading);
+        var versionData = await StartSpinnerAsync(App.UpdateChecking, _ => GetBucketFile("schicksal/version"));
+        var versionInfo = UpdateInfo.Parser.ParseFrom(versionData)!;
+        if (GlobalVars.AppVersionCode < versionInfo.VersionCode) {
+            AnsiConsole.WriteLine(App.UpdateNewVersion, GlobalVars.AppVersionName, versionInfo.VersionName);
+            AnsiConsole.WriteLine(App.UpdateDescription, versionInfo.Description);
+            if (versionInfo.EnableAutoUpdate) {
+                var newBin = await StartSpinnerAsync(App.UpdateDownloading, _ => GetBucketFile(versionInfo.PackageLink));
                 var tmpPath = Path.GetTempFileName();
-                await File.WriteAllBytesAsync(tmpPath, await GetBucketFile(info.PackageLink));
                 var updaterPath = Path.Combine(GlobalVars.DataPath, "update.exe");
                 await using (var dstStream = File.Open($"{GlobalVars.DataPath}/update.exe", FileMode.Create)) {
                     await using var srcStream = typeof(Program).Assembly.GetManifestResourceStream("updater")!;
                     await srcStream.CopyToAsync(dstStream);
                 }
+                await File.WriteAllBytesAsync(tmpPath, newBin);
                 ShellOpen(updaterPath, $"{Environment.ProcessId} \"{tmpPath}\"");
-                await Task.Delay(1919810);
+                await StartSpinnerAsync(App.UpdateChecking, _ => Task.Delay(1919810));
                 GlobalVars.PauseOnExit = false;
                 Environment.Exit(0);
             }
-            Console.WriteLine(App.DownloadLink, info.PackageLink);
-            if (info.ForceUpdate) {
+            AnsiConsole.MarkupLine($"[link]{App.DownloadLink}[/]", versionInfo.PackageLink);
+            if (versionInfo.ForceUpdate) {
                 Environment.Exit(0);
             }
         }
-        if (info.EnableLibDownload && !useLocalLib) {
+        if (versionInfo.EnableLibDownload && !useLocalLib) {
             var data = await GetBucketFile("schicksal/lic.dll");
             await File.WriteAllBytesAsync(GlobalVars.LibFilePath, data);
         }
-        _updateInfo = info;
+        _updateInfo = versionInfo;
     }
 
     // ReSharper disable once UnusedMethodReturnValue.Global
@@ -142,7 +157,7 @@ public static class Utils {
             try {
                 using var handle = File.OpenHandle($"{path}/output_log.txt", share: FileShare.None);
             } catch (IOException) {
-                Console.WriteLine(App.GenshinIsRunning, 0);
+                AnsiConsole.WriteLine(App.GenshinIsRunning, 0);
                 Environment.Exit(301);
             }
         }
@@ -154,7 +169,7 @@ public static class Utils {
         AppDomain.CurrentDomain.ProcessExit += (_, _) => {
             _proc?.Terminate(0);
             if (GlobalVars.PauseOnExit) {
-                Console.WriteLine(App.PressKeyToExit);
+                AnsiConsole.WriteLine(App.PressKeyToExit);
                 Console.ReadKey();
             }
         };
@@ -165,16 +180,16 @@ public static class Utils {
             var ex = e.ExceptionObject;
             switch (ex) {
                 case ApplicationException ex1:
-                    Console.WriteLine(ex1.Message);
+                    AnsiConsole.WriteLine(ex1.Message);
                     break;
                 case SocketException ex2:
-                    Console.WriteLine(App.ExceptionNetwork, nameof(SocketException), ex2.Message);
+                    AnsiConsole.WriteLine(App.ExceptionNetwork, nameof(SocketException), ex2.Message);
                     break;
                 case HttpRequestException ex3:
-                    Console.WriteLine(App.ExceptionNetwork, nameof(HttpRequestException), ex3.Message);
+                    AnsiConsole.WriteLine(App.ExceptionNetwork, nameof(HttpRequestException), ex3.Message);
                     break;
                 default:
-                    Console.WriteLine(ex.ToString());
+                    AnsiConsole.WriteLine(ex.ToString()!);
                     break;
             }
             Environment.Exit(-1);
@@ -189,13 +204,13 @@ public static class Utils {
         _proc.OnExit += () => {
             if (_isUnexpectedExit) {
                 _proc = null;
-                Console.WriteLine(App.GameProcessExit);
+                AnsiConsole.WriteLine(App.GameProcessExit);
                 Environment.Exit(114514);
             }
         };
         _proc.LoadLibrary(GlobalVars.LibFilePath);
         _proc.ResumeMainThread();
-        Console.WriteLine(App.GameLoading, _proc.Id);
+        AnsiConsole.WriteLine(App.GameLoading, _proc.Id);
         Task.Run(() => {
             using var stream = new NamedPipeServerStream(GlobalVars.PipeName);
             using var reader = new BinaryReader(stream);

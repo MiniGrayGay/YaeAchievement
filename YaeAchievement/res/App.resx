@@ -25,16 +25,7 @@
         <value>all achievement</value>
     </data>
     <data name="ExportChoose" xml:space="preserve">
-        <value>Export to: 
-[0] Cocogoat (https://cocogoat.work/achievement, Default)
-[1] Snap.HuTao
-[2] Paimon.moe
-[3] Seelie.me
-[4] Csv file
-[5] Xunkong
-[7] Teyvat Guide
-[8] UIAF JSON File
-Input a number (0-8): </value>
+        <value>Export to:</value>
     </data>
     <data name="ExportToCocogoatSuccess" xml:space="preserve">
         <value>Successfully exported to cocogoat.</value>
@@ -107,7 +98,7 @@ Input a number (0-8): </value>
         <value>YaeAchievement ({0})</value>
     </data>
     <data name="UsePreviousData" xml:space="preserve">
-        <value>Use previous fetched data? (yes|no)</value>
+        <value>Use previous fetched data?</value>
     </data>
     <data name="NetworkError" xml:space="preserve">
         <value>Network error:</value>
@@ -121,7 +112,6 @@ Input a number (0-8): </value>
     <data name="ExceptionNetwork" xml:space="preserve">
         <value>Network error ({0}: {1})</value>
     </data>
-    <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
     <data name="GenshinHashError" xml:space="preserve">
         <value>Please update genshin and retry.</value>
     </data>
@@ -136,5 +126,41 @@ Input a number (0-8): </value>
     </data>
     <data name="WaitMetadataUpdate" xml:space="preserve">
         <value>Please update game and retry.</value>
+    </data>
+    <data name="UpdateChecking" xml:space="preserve">
+        <value>Checking update...</value>
+    </data>
+    <data name="CommonYes" xml:space="preserve">
+        <value>Yes</value>
+    </data>
+    <data name="CommonNo" xml:space="preserve">
+        <value>No</value>
+    </data>
+    <data name="ExportTargetCocogoat" xml:space="preserve">
+        <value>Cocogoat (https://cocogoat.work/achievement)</value>
+    </data>
+    <data name="ExportTargetHuTao" xml:space="preserve">
+        <value>Snap.HuTao</value>
+    </data>
+    <data name="ExportTargetPaimon" xml:space="preserve">
+        <value>Paimon.moe</value>
+    </data>
+    <data name="ExportTargetSeelie" xml:space="preserve">
+        <value>Seelie.me</value>
+    </data>
+    <data name="ExportTargetCsv" xml:space="preserve">
+        <value>Csv file</value>
+    </data>
+    <data name="ExportTargetXunkong" xml:space="preserve">
+        <value>Xunkong</value>
+    </data>
+    <data name="ExportTargetTeyvatGuide" xml:space="preserve">
+        <value>Teyvat Guide</value>
+    </data>
+    <data name="ExportTargetUIAFJson" xml:space="preserve">
+        <value>UIAF JSON File</value>
+    </data>
+    <data name="ExportTargetWxApp1" xml:space="preserve">
+        <value />
     </data>
 </root>

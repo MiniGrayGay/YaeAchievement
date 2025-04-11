@@ -5,37 +5,40 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Win32;
+using Spectre.Console;
 using YaeAchievement.Outputs;
 using YaeAchievement.Parsers;
 using YaeAchievement.res;
+
+// ReSharper disable UnusedMember.Local
 
 namespace YaeAchievement;
 
 public static class Export {
 
-    public static uint ExportTo { get; set; } = uint.MaxValue;
+    public static int ExportTo { get; set; } = 114514;
 
     public static void Choose(AchievementAllDataNotify data) {
-        if (ExportTo == uint.MaxValue) {
-            Console.Write(App.ExportChoose);
-            while (Console.KeyAvailable) {
-                Console.ReadKey(false);
-            }
-            if (!uint.TryParse(Console.ReadLine(), out var num)) num = 0;
-            ExportTo = num;
+        var targets = new Dictionary<string, Action<AchievementAllDataNotify>> {
+            { App.ExportTargetCocogoat, ToCocogoat },
+            { App.ExportTargetHuTao, ToHuTao },
+            { App.ExportTargetPaimon, ToPaimon },
+            { App.ExportTargetSeelie, ToSeelie },
+            { App.ExportTargetCsv, ToCSV },
+            { App.ExportTargetXunkong, ToXunkong },
+            // { App.ExportTargetWxApp1, ToWxApp1 },
+            { App.ExportTargetTeyvatGuide, ToTeyvatGuide },
+            { App.ExportTargetUIAFJson, ToUIAFJson },
+            // { "", ToRawJson }
+        };
+        Action<AchievementAllDataNotify> action;
+        if (ExportTo == 114514) {
+            var prompt = new SelectionPrompt<string>().Title(App.ExportChoose).AddChoices(targets.Keys);
+            action = targets[AnsiConsole.Prompt(prompt)];
+        } else {
+            action = targets.ElementAtOrDefault(ExportTo).Value ?? ToCocogoat;
         }
-        ((Action<AchievementAllDataNotify>) (ExportTo switch {
-            1 => ToHuTao,
-            2 => ToPaimon,
-            3 => ToSeelie,
-            4 => ToCSV,
-            5 => ToXunkong,
-            6 => ToWxApp1,
-            7 => ToTeyvatGuide,
-            8 => ToUIAFJson,
-            9 => ToRawJson,
-            _ => ToCocogoat
-        })).Invoke(data);
+        action(data);
     }
 
     private static void ToCocogoat(AchievementAllDataNotify data) {
@@ -46,17 +49,17 @@ public static class Export {
         request.Content = new StringContent(result, Encoding.UTF8, "application/json");
         using var response = Utils.CHttpClient.Send(request);
         if (response.StatusCode != HttpStatusCode.Created) {
-            Console.WriteLine(App.ExportToCocogoatFail);
+            AnsiConsole.WriteLine(App.ExportToCocogoatFail);
             return;
         }
         var responseText = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
         var responseJson = JsonSerializer.Deserialize(responseText, CocogoatResponseContext.Default.CocogoatResponse)!;
         var cocogoatUrl = $"https://cocogoat.work/achievement?memo={responseJson.Key}";
         Utils.SetQuickEditMode(true);
-        Console.WriteLine(cocogoatUrl);
+        AnsiConsole.MarkupLineInterpolated($"[link]{cocogoatUrl}[/]");
         if (Utils.ShellOpen(cocogoatUrl))
         {
-            Console.WriteLine(App.ExportToCocogoatSuccess);
+            AnsiConsole.WriteLine(App.ExportToCocogoatSuccess);
         }
     }
 
@@ -68,16 +71,16 @@ public static class Export {
         request.RequestUri = new Uri("https://api.qyinter.com/achievementRedis");
         request.Content = new StringContent(result, Encoding.UTF8, "application/json");
         using var response = Utils.CHttpClient.Send(request);
-        Console.WriteLine(App.ExportToWxApp1Success, id);
+        AnsiConsole.WriteLine(App.ExportToWxApp1Success, id);
     }
 
     private static void ToHuTao(AchievementAllDataNotify data) {
         if (CheckWinUIAppScheme("hutao")) {
             Utils.CopyToClipboard(UIAFSerializer.Serialize(data));
             Utils.ShellOpen("hutao://achievement/import");
-            Console.WriteLine(App.ExportToSnapGenshinSuccess);
+            AnsiConsole.WriteLine(App.ExportToSnapGenshinSuccess);
         } else {
-            Console.WriteLine(App.ExportToSnapGenshinNeedUpdate);
+            AnsiConsole.WriteLine(App.ExportToSnapGenshinNeedUpdate);
             Utils.ShellOpen("ms-windows-store://pdp/?productid=9PH4NXJ2JN52");
         }
     }
@@ -86,9 +89,9 @@ public static class Export {
         if (CheckWinUIAppScheme("xunkong")) {
             Utils.CopyToClipboard(UIAFSerializer.Serialize(data));
             Utils.ShellOpen("xunkong://import-achievement?caller=YaeAchievement&from=clipboard");
-            Console.WriteLine(App.ExportToXunkongSuccess);
+            AnsiConsole.WriteLine(App.ExportToXunkongSuccess);
         } else {
-            Console.WriteLine(App.ExportToXunkongNeedUpdate);
+            AnsiConsole.WriteLine(App.ExportToXunkongNeedUpdate);
             Utils.ShellOpen("ms-windows-store://pdp/?productid=9N2SVG0JMT12");
         }
     }
@@ -97,9 +100,9 @@ public static class Export {
         if (Process.GetProcessesByName("TeyvatGuide").Length != 0) {
             Utils.CopyToClipboard(UIAFSerializer.Serialize(data));
             Utils.ShellOpen("teyvatguide://import_uiaf?app=Yae");
-            Console.WriteLine(App.ExportToTauriSuccess);
+            AnsiConsole.WriteLine(App.ExportToTauriSuccess);
         } else {
-            Console.WriteLine(App.ExportToTauriFail);
+            AnsiConsole.WriteLine(App.ExportToTauriFail);
             Utils.ShellOpen("ms-windows-store://pdp/?productid=9NLBNNNBNSJN");
         }
     }
@@ -108,21 +111,21 @@ public static class Export {
     private static void ToUIAFJson(AchievementAllDataNotify data) {
         var path = Path.GetFullPath($"uiaf-{DateTime.Now:yyyyMMddHHmmss}.json");
         if (TryWriteToFile(path, UIAFSerializer.Serialize(data))) {
-            Console.WriteLine(App.ExportToFileSuccess, path);
+            AnsiConsole.WriteLine(App.ExportToFileSuccess, path);
         }
     }
 
     private static void ToPaimon(AchievementAllDataNotify data) {
         var path = Path.GetFullPath($"export-{DateTime.Now:yyyyMMddHHmmss}-paimon.json");
         if (TryWriteToFile(path, PaimonSerializer.Serialize(data))) {
-            Console.WriteLine(App.ExportToFileSuccess, path);
+            AnsiConsole.WriteLine(App.ExportToFileSuccess, path);
         }
     }
 
     private static void ToSeelie(AchievementAllDataNotify data) {
         var path = Path.GetFullPath($"export-{DateTime.Now:yyyyMMddHHmmss}-seelie.json");
         if (TryWriteToFile(path, SeelieSerializer.Serialize(data))) {
-            Console.WriteLine(App.ExportToFileSuccess, path);
+            AnsiConsole.WriteLine(App.ExportToFileSuccess, path);
         }
     }
 
@@ -133,7 +136,7 @@ public static class Export {
         foreach (var ach in data.AchievementList.OrderBy(a => a.Id)) {
             if (UnusedAchievement.Contains(ach.Id)) continue;
             if (!info.Items.TryGetValue(ach.Id, out var achInfo) || achInfo == null) {
-                Console.WriteLine($@"Unable to find {ach.Id} in metadata.");
+                AnsiConsole.WriteLine($@"Unable to find {ach.Id} in metadata.");
                 continue;
             }
             var finishAt = "";
@@ -156,7 +159,7 @@ public static class Export {
         }));
         var path = Path.GetFullPath($"achievement-{DateTime.Now:yyyyMMddHHmmss}.csv");
         if (TryWriteToFile(path, $"\uFEFF{string.Join("\n", output)}")) {
-            Console.WriteLine(App.ExportToFileSuccess, path);
+            AnsiConsole.WriteLine(App.ExportToFileSuccess, path);
             Process.Start("explorer.exe", $"{Path.GetDirectoryName(path)}");
         }
     }
@@ -165,7 +168,7 @@ public static class Export {
         var path = Path.GetFullPath($"export-{DateTime.Now:yyyyMMddHHmmss}-raw.json");
         var text = AchievementRawDataSerializer.Serialize(data);
         if (TryWriteToFile(path, text)) {
-            Console.WriteLine(App.ExportToFileSuccess, path);
+            AnsiConsole.WriteLine(App.ExportToFileSuccess, path);
         }
     }
 
@@ -192,7 +195,7 @@ public static class Export {
 
     public static int PrintMsgAndReturnErrCode(this Win32Exception ex, string msg) {
         // ReSharper disable once LocalizableElement
-        Console.WriteLine($"{msg}: {ex.Message}");
+        AnsiConsole.WriteLine($"{msg}: {ex.Message}");
         return ex.NativeErrorCode;
     }
 
@@ -201,7 +204,7 @@ public static class Export {
             File.WriteAllText(path, contents);
             return true;
         } catch (UnauthorizedAccessException) {
-            Console.WriteLine(App.NoWritePermission, path);
+            AnsiConsole.WriteLine(App.NoWritePermission, path);
             return false;
         }
     }

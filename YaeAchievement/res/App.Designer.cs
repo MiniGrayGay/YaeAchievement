@@ -87,6 +87,24 @@ namespace YaeAchievement.res {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No.
+        /// </summary>
+        internal static string CommonNo {
+            get {
+                return ResourceManager.GetString("CommonNo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Yes.
+        /// </summary>
+        internal static string CommonYes {
+            get {
+                return ResourceManager.GetString("CommonYes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You need to login genshin impact before exporting..
         /// </summary>
         internal static string ConfigNeedStartGenshin {
@@ -114,20 +132,92 @@ namespace YaeAchievement.res {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Export to: 
-        ///[0] Cocogoat (https://cocogoat.work/achievement, Default)
-        ///[1] Snap.HuTao
-        ///[2] Paimon.moe
-        ///[3] Seelie.me
-        ///[4] Csv file
-        ///[5] Xunkong
-        ///[7] Teyvat Guide
-        ///[8] UIAF JSON File
-        ///Input a number (0-8): .
+        ///   Looks up a localized string similar to Export to:.
         /// </summary>
         internal static string ExportChoose {
             get {
                 return ResourceManager.GetString("ExportChoose", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cocogoat (https://cocogoat.work/achievement).
+        /// </summary>
+        internal static string ExportTargetCocogoat {
+            get {
+                return ResourceManager.GetString("ExportTargetCocogoat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Csv file.
+        /// </summary>
+        internal static string ExportTargetCsv {
+            get {
+                return ResourceManager.GetString("ExportTargetCsv", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Snap.HuTao.
+        /// </summary>
+        internal static string ExportTargetHuTao {
+            get {
+                return ResourceManager.GetString("ExportTargetHuTao", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Paimon.moe.
+        /// </summary>
+        internal static string ExportTargetPaimon {
+            get {
+                return ResourceManager.GetString("ExportTargetPaimon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Seelie.me.
+        /// </summary>
+        internal static string ExportTargetSeelie {
+            get {
+                return ResourceManager.GetString("ExportTargetSeelie", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Teyvat Guide.
+        /// </summary>
+        internal static string ExportTargetTeyvatGuide {
+            get {
+                return ResourceManager.GetString("ExportTargetTeyvatGuide", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to UIAF JSON File.
+        /// </summary>
+        internal static string ExportTargetUIAFJson {
+            get {
+                return ResourceManager.GetString("ExportTargetUIAFJson", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string ExportTargetWxApp1 {
+            get {
+                return ResourceManager.GetString("ExportTargetWxApp1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Xunkong.
+        /// </summary>
+        internal static string ExportTargetXunkong {
+            get {
+                return ResourceManager.GetString("ExportTargetXunkong", resourceCulture);
             }
         }
         
@@ -321,6 +411,15 @@ namespace YaeAchievement.res {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Checking update....
+        /// </summary>
+        internal static string UpdateChecking {
+            get {
+                return ResourceManager.GetString("UpdateChecking", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Description: 
         ///{0}.
         /// </summary>
@@ -358,7 +457,7 @@ namespace YaeAchievement.res {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Use previous fetched data? (yes|no).
+        ///   Looks up a localized string similar to Use previous fetched data?.
         /// </summary>
         internal static string UsePreviousData {
             get {

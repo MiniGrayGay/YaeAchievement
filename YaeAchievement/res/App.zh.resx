@@ -18,17 +18,7 @@
         <value>全部成就</value>
     </data>
     <data name="ExportChoose" xml:space="preserve">
-        <value>导出至: 
-[0] 椰羊 (https://cocogoat.work/achievement, 默认)
-[1] Snap Hutao
-[2] Paimon.moe
-[3] Seelie.me
-[4] 表格文件
-[5] 寻空
-[6] 原魔工具箱
-[7] Teyvat Guide
-[8] UIAF JSON 文件
-输入一个数字 (0-8): </value>
+        <value>导出至:</value>
     </data>
     <data name="ExportToCocogoatSuccess" xml:space="preserve">
         <value>在浏览器内进行下一步操作</value>
@@ -101,7 +91,7 @@
         <value>YaeAchievement - 原神成就导出工具 ({0})</value>
     </data>
     <data name="UsePreviousData" xml:space="preserve">
-        <value>要使用上一次获取到的成就数据吗? (yes|no)</value>
+        <value>要使用上一次获取到的成就数据吗? </value>
     </data>
     <data name="NetworkError" xml:space="preserve">
         <value>网络错误: {0}</value>
@@ -129,5 +119,41 @@
     </data>
     <data name="WaitMetadataUpdate" xml:space="preserve">
         <value>当前元数据版本不匹配，请更新原神至最新版本或等待元数据更新后重试。</value>
+    </data>
+    <data name="UpdateChecking" xml:space="preserve">
+        <value>正在检查更新...</value>
+    </data>
+    <data name="CommonYes" xml:space="preserve">
+        <value>是</value>
+    </data>
+    <data name="CommonNo" xml:space="preserve">
+        <value>否</value>
+    </data>
+    <data name="ExportTargetCocogoat" xml:space="preserve">
+        <value>椰羊 (https://cocogoat.work/achievement)</value>
+    </data>
+    <data name="ExportTargetHuTao" xml:space="preserve">
+        <value>Snap Hutao</value>
+    </data>
+    <data name="ExportTargetPaimon" xml:space="preserve">
+        <value>Paimon.moe</value>
+    </data>
+    <data name="ExportTargetSeelie" xml:space="preserve">
+        <value>Seelie.me</value>
+    </data>
+    <data name="ExportTargetCsv" xml:space="preserve">
+        <value>表格文件</value>
+    </data>
+    <data name="ExportTargetXunkong" xml:space="preserve">
+        <value>寻空</value>
+    </data>
+    <data name="ExportTargetUIAFJson" xml:space="preserve">
+        <value>UIAF JSON 文件</value>
+    </data>
+    <data name="ExportTargetTeyvatGuide" xml:space="preserve">
+        <value>Teyvat Guide</value>
+    </data>
+    <data name="ExportTargetWxApp1" xml:space="preserve">
+        <value>原魔工具箱</value>
     </data>
 </root>

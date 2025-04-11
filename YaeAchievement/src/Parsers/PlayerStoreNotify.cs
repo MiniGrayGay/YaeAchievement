@@ -1,5 +1,6 @@
 ﻿using Google.Protobuf;
 using Proto;
+using Spectre.Console;
 
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable CollectionNeverQueried.Global
@@ -51,7 +52,7 @@ public class PlayerStoreNotify {
             }
         } catch (InvalidProtocolBufferException) {
             // ReSharper disable once LocalizableElement
-            Console.WriteLine("Parse failed");
+            AnsiConsole.WriteLine("Parse failed");
             File.WriteAllBytes("store_raw_data.bin", bytes);
             Environment.Exit(0);
         }

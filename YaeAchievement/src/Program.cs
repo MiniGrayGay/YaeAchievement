@@ -1,5 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Text;
+using Spectre.Console;
 using YaeAchievement.Parsers;
 using YaeAchievement.res;
 using YaeAchievement.Utilities;
@@ -11,8 +12,13 @@ internal static class Program {
 
     public static async Task Main(string[] args) {
 
+        AnsiConsole.WriteLine(@"----------------------------------------------------");
+        AnsiConsole.WriteLine(App.AppBanner, GlobalVars.AppVersionName);
+        AnsiConsole.WriteLine(@"https://github.com/HolographicHat/YaeAchievement");
+        AnsiConsole.WriteLine(@"----------------------------------------------------");
+
         if (!new Mutex(true, @"Global\YaeMiku~uwu").WaitOne(0, false)) {
-            Console.WriteLine(App.AnotherInstance);
+            AnsiConsole.WriteLine(App.AnotherInstance);
             Environment.Exit(302);
         }
 
@@ -21,15 +27,10 @@ internal static class Program {
 
         CheckGenshinIsRunning();
 
-        Console.WriteLine(@"----------------------------------------------------");
-        Console.WriteLine(App.AppBanner, GlobalVars.AppVersionName);
-        Console.WriteLine(@"https://github.com/HolographicHat/YaeAchievement");
-        Console.WriteLine(@"----------------------------------------------------");
-
         AppConfig.Load(args.GetOrNull(0) ?? "auto");
-        Export.ExportTo = ToUIntOrNull(args.GetOrNull(1)) ?? uint.MaxValue;
+        Export.ExportTo = ToIntOrDefault(args.GetOrNull(1), 114514);
 
-        await CheckUpdate(ToBooleanOrFalse(args.GetOrNull(2)));
+        await CheckUpdate(ToBooleanOrDefault(args.GetOrNull(2)));
 
         AchievementAllDataNotify? data = null;
         try {
@@ -39,8 +40,10 @@ internal static class Program {
         } catch (Exception) { /* ignored */ }
 
         if (CacheFile.GetLastWriteTime("achievement_data").AddMinutes(60) > DateTime.UtcNow && data != null) {
-            Console.WriteLine(App.UsePreviousData);
-            if (Console.ReadLine()?.ToUpper() is "Y" or "YES") {
+            var prompt = new SelectionPrompt<string>()
+                .Title(App.UsePreviousData)
+                .AddChoices(App.CommonYes, App.CommonNo);
+            if (AnsiConsole.Prompt(prompt) == App.CommonYes) {
                 Export.Choose(data);
                 return;
             }
@@ -51,7 +54,7 @@ internal static class Program {
             { 2, PlayerStoreNotify.OnReceive },
             { 100, PlayerPropNotify.OnReceive },
         }, () => {
-#if DEBUG
+#if DEBUG_EX
             PlayerPropNotify.OnFinish();
             File.WriteAllText("store_data.json", JsonSerializer.Serialize(PlayerStoreNotify.Instance, new JsonSerializerOptions {
                 WriteIndented = true,

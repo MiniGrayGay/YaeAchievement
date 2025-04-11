@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using Google.Protobuf;
+using Spectre.Console;
 using YaeAchievement.res;
 using YaeAchievement.Utilities;
 
@@ -73,7 +74,7 @@ public class AchievementAllDataNotify {
             }
         } catch (InvalidProtocolBufferException) {
             // ReSharper disable once LocalizableElement
-            Console.WriteLine("Parse failed");
+            AnsiConsole.WriteLine("Parse failed");
             File.WriteAllBytes("achievement_raw_data.bin", bytes);
             Environment.Exit(0);
         }
@@ -98,7 +99,7 @@ public class AchievementAllDataNotify {
                 .FieldIds;
             #if DEBUG
             // ReSharper disable once LocalizableElement
-            Console.WriteLine($"Id={iId}, Status={sId}, Total={totalId}, Current={currentId}, Timestamp={tId}");
+            AnsiConsole.WriteLine($"Id={iId}, Status={sId}, Total={totalId}, Current={currentId}, Timestamp={tId}");
             #endif
         } else {
             var info = GlobalVars.AchievementInfo.PbInfo; // ...
@@ -108,7 +109,7 @@ public class AchievementAllDataNotify {
             totalId = info.TotalProgress;
             currentId = info.CurrentProgress;
             if (data.Any(dict => !dict.ContainsKey(iId) || !dict.ContainsKey(sId) || !dict.ContainsKey(totalId))) {
-                Console.WriteLine(App.WaitMetadataUpdate);
+                AnsiConsole.WriteLine(App.WaitMetadataUpdate);
                 Environment.Exit(0);
             }
         }

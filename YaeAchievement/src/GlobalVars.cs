@@ -4,11 +4,6 @@ using Proto;
 
 namespace YaeAchievement;
 
-// ReSharper disable InconsistentNaming
-// ReSharper disable ConvertToConstant.Global
-// ReSharper disable FieldCanBeMadeReadOnly.Global
-// ReSharper disable once MemberCanBePrivate.Global
-
 public static class GlobalVars {
 
     public static bool PauseOnExit { get; set; } = true;
@@ -24,8 +19,6 @@ public static class GlobalVars {
     public const string AppVersionName = "5.3";
 
     public const string PipeName = "YaeAchievementPipe";
-    public const string RinBucketHost = "https://rin.holohat.work";
-    public const string SakuraBucketHost = "https://cn-cd-1259389942.file.myqcloud.com";
 
     [field:MaybeNull]
     public static AchievementInfo AchievementInfo =>
