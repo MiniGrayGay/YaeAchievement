@@ -18,7 +18,7 @@
         <value>全部成就</value>
     </data>
     <data name="ExportChoose" xml:space="preserve">
-        <value>导出至:</value>
+        <value>要导出到哪里？（键盘上下键移动光标，键盘回车键选择）</value>
     </data>
     <data name="ExportToCocogoatSuccess" xml:space="preserve">
         <value>在浏览器内进行下一步操作</value>
@@ -91,7 +91,7 @@
         <value>YaeAchievement - 原神成就导出工具 ({0})</value>
     </data>
     <data name="UsePreviousData" xml:space="preserve">
-        <value>要使用上一次获取到的成就数据吗? </value>
+        <value>要使用上一次获取到的成就数据吗？（键盘上下键移动光标，键盘回车键选择）</value>
     </data>
     <data name="NetworkError" xml:space="preserve">
         <value>网络错误: {0}</value>
