@@ -14,8 +14,6 @@
 
 ## Export support
 
-> Select the export method according to the number keys, <kbd>0</kbd> is the default export method
-
 0. [Cocogoat](https://cocogoat.work/achievement)
 1. [Snap HuTao](https://github.com/DGP-Studio/Snap.HuTao)
 2. [Paimon.moe](https://paimon.moe/achievement/)
@@ -35,10 +33,6 @@
 [issues](https://github.com/HolographicHat/YaeAchievement/issues) or [QQ群: 598720036](https://qm.qq.com/cgi-bin/qm/qr?k=9UGz-chQVTjZa4b82RA_A41vIcBVNpms&jump_from=webapi)
 
 ## Frequently asked questions
-0. Q: Unable to start   
-   A: Download and install [.NET Runtime 9](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-9.0.3-windows-x64-installer) or ` winget install Microsoft.DotNet.Runtime.9`
- 
-
 1. Q: Error while Genshin started: Data Exception (31-4302)   
    A: Don't place software in the directory containing Genshin Impact.
   

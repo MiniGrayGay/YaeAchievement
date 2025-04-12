@@ -8,19 +8,7 @@
 
 ![1](https://github.com/user-attachments/assets/8b98c018-b179-4681-992d-367a0f522dae)
 
-2.安装启动软件所需文件（若已安装该运行时可忽略此步骤）
-
-点击该网址：https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-9.0.3-windows-x64-installer 。
-
-进入网页后浏览器会自动弹出下载，同样地，将文件保存在桌面或者其它易于寻找的文件夹内。
-
-下载完成后打开名称形如dotnet-runtime-x.x.x-win-x64.exe的文件，会弹出安装窗口，如下图所示。
-
-![2](https://github.com/user-attachments/assets/4830a824-34c0-479e-9c9c-fc23e99003bf)
-
-直接点击安装即可。
-
-3.打开主程序所需的操作以及成就导出的选择
+2.打开主程序所需的操作以及成就导出的选择
 
 双击在第一步下载的名称为“YaeAchievement.exe”的文件，成功打开后会提示原神正在启动，如下图所示。
 

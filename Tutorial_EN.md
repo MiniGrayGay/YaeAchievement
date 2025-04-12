@@ -9,20 +9,6 @@ you save this file in a desktop or other easy-to-see folder.
 
 ![Step1](https://github.com/user-attachments/assets/dbe32d1f-3a73-4948-b854-1fb6151ad7f3)
 
-2.Install .NET Runtime 9 (this step can be ignored if the runtime is already installed)
-
-Click Here：https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-9.0.3-windows-x64-installer .
-
-Or `winget install Microsoft.DotNet.Runtime.9` if you use Windows 11 or have Winget installed.
-
-The browser automatically pops up and downloads when you enter the web page, as well as saving files in a desktop or other easy-to-see folder.
-
-When you open a file with the name dotnet-runtime-x.x.x-win-x64.exe after the download is complete, an installation window pops up, as shown below.
-
-![Guide2](https://github.com/user-attachments/assets/35f421af-dd45-41ea-94f9-e3cf90710f0f)
-
-Just click Install.
-
 3.The actions required to open the main program and the options for the achievement export
 
 Double-click the file named "YaeAchievement.exe" downloaded in the first step to open it successfully, indicating that the original god is starting, as shown below.

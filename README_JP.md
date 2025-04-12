@@ -14,8 +14,6 @@
 
 ## エクスポートサポート
 
-> 数字キーに従ってエクスポート方法を選択します。<kbd>0</kbd> はデフォルトのエクスポート方法です
-
 0. [椰羊](https://cocogoat.work/achievement)
 1. [胡桃ツールボックス](https://github.com/DGP-Studio/Snap.HuTao)
 2. [Paimon.moe](https://paimon.moe/achievement/)
@@ -35,10 +33,6 @@
 [issues](https://github.com/HolographicHat/YaeAchievement/issues) または [QQ群: 598720036](https://qm.qq.com/cgi-bin/qm/qr?k=9UGz-chQVTjZa4b82RA_A41vIcBVNpms&jump_from=webapi)
 
 ## よくある質問
-0. Q: 起動できない   
-   A: [.NET Runtime 9](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-9.0.3-windows-x64-installer) をダウンロードしてインストールするか、`winget install Microsoft.DotNet.Runtime.9` を実行してください。
- 
-
 1. Q: 原神を起動中にエラーが発生しました: データ例外 (31-4302)   
    A: ソフトウェアを原神のディレクトリに配置しないでください。
   

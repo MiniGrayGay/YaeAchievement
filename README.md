@@ -13,8 +13,6 @@
 
 ## 导出支持
 
-> 按照数字键选择导出方式，<kbd>0</kbd> 为默认导出方式
-
 0. [椰羊](https://cocogoat.work/achievement)
 1. [胡桃工具箱](https://github.com/DGP-Studio/Snap.HuTao)
 2. [Paimon.moe](https://paimon.moe/achievement/)
@@ -35,8 +33,5 @@
 [issues](https://github.com/HolographicHat/YaeAchievement/issues)或[QQ群: 598720036](https://qm.qq.com/cgi-bin/qm/qr?k=9UGz-chQVTjZa4b82RA_A41vIcBVNpms&jump_from=webapi)
 
 ## 常见问题
-0. Q: 打不开   
-   A: 安装 [.NET Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-9.0.3-windows-x64-installer)
-
 1. Q: 原神启动时报错: 数据异常(31-4302)   
    A: 不要把软件和原神主程序放一起   

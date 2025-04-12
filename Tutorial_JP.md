@@ -8,20 +8,6 @@
 
 ![Guide1](https://github.com/user-attachments/assets/dbe32d1f-3a73-4948-b854-1fb6151ad7f3)
 
-2. .NET Runtime 9をインストール（ランタイムが既にインストールされている場合はこのステップを無視できます）
-
-こちらをクリック：https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-9.0.3-windows-x64-installer .
-
-または、Windows 11を使用しているか、Wingetがインストールされている場合は、`winget install Microsoft.DotNet.Runtime.9`を実行します。
-
-ウェブページにアクセスすると、ブラウザが自動的にポップアップしてダウンロードされます。ファイルをデスクトップや他の見やすいフォルダに保存します。
-
-ダウンロードが完了したら、dotnet-runtime-x.x.x-win-x64.exeという名前のファイルを開くと、インストールウィンドウがポップアップします。以下の図のように表示されます。
-
-![Guide2](https://github.com/user-attachments/assets/35f421af-dd45-41ea-94f9-e3cf90710f0f)
-
-インストールをクリックするだけです。
-
 3. メインプログラムを開くための操作と実績エクスポートのオプション
 
 最初のステップでダウンロードした「YaeAchievement.exe」という名前のファイルをダブルクリックして開くと、原神が起動していることを示します。以下の図のように表示されます。
