@@ -369,7 +369,7 @@ namespace
 
 		// look for ItemModule.GetBagManagerByStoreType <- mf got inlined in 5.5
 		// we just gon to look for OnPlayerStoreNotify
-		const auto candidates = Util::PatternScanAll(il2cppSection, "41 83 F8 02 ? ? ? ? ? ? ? ? ? ? ? ? ? ? 41 83 F8 01");
+		const auto candidates = Util::PatternScanAll(il2cppSection, "41 83 F8 02 B8 ? ? ? ? B9 ? ? ? ? 48 0F 45 C1");
 		std::println("Candidates: {}", candidates.size());
 		if (candidates.empty())
 			return;
