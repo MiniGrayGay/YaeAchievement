@@ -16,8 +16,7 @@
     <PropertyGroup>
         <PublishAot>true</PublishAot>
         <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-        <IlcOptimizationPreference>Size</IlcOptimizationPreference>
-        <IlcFoldIdenticalMethodBodies>true</IlcFoldIdenticalMethodBodies>
+        <OptimizationPreference>Size</OptimizationPreference>
     </PropertyGroup>
 
     <ItemGroup>
@@ -29,6 +28,7 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="Sentry" Version="5.6.0" />
         <PackageReference Include="Spectre.Console" Version="0.50.1-preview.0.3" />
         <PackageReference Include="Spectre.Console.Analyzer" Version="1.0.0">
           <PrivateAssets>all</PrivateAssets>

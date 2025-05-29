@@ -82,7 +82,14 @@ public class AchievementAllDataNotify {
             return new AchievementAllDataNotify();
         }
         uint tId, sId, iId, currentId, totalId;
-        if (data.Count > 20) { /* uwu */
+        if (data.All(CheckKnownFieldIdIsValid)) {
+            var info = GlobalVars.AchievementInfo.PbInfo;
+            iId = info.Id;
+            tId = info.FinishTimestamp;
+            sId = info.Status;
+            totalId = info.TotalProgress;
+            currentId = info.CurrentProgress;
+        } else if (data.Count > 20) {
             (tId, var cnt) = data //        ↓ 2020-09-15 04:15:14
                 .GroupKeys(value => value > 1600114514).Select(g => (g.Key, g.Count())).MaxBy(p => p.Item2);
             sId = data //           FINISHED ↓    ↓ REWARD_TAKEN
@@ -97,21 +104,14 @@ public class AchievementAllDataNotify {
                 .Select(g => (FieldIds: g.Key, Count: g.Count()))
                 .MaxBy(p => p.Count)
                 .FieldIds;
-            #if DEBUG
+#if DEBUG
             // ReSharper disable once LocalizableElement
             AnsiConsole.WriteLine($"Id={iId}, Status={sId}, Total={totalId}, Current={currentId}, Timestamp={tId}");
-            #endif
+#endif
         } else {
-            var info = GlobalVars.AchievementInfo.PbInfo; // ...
-            iId = info.Id;
-            tId = info.FinishTimestamp;
-            sId = info.Status;
-            totalId = info.TotalProgress;
-            currentId = info.CurrentProgress;
-            if (data.Any(dict => !dict.ContainsKey(iId) || !dict.ContainsKey(sId) || !dict.ContainsKey(totalId))) {
-                AnsiConsole.WriteLine(App.WaitMetadataUpdate);
-                Environment.Exit(0);
-            }
+            AnsiConsole.WriteLine(App.WaitMetadataUpdate);
+            Environment.Exit(0);
+            return null!;
         }
         return new AchievementAllDataNotify {
             AchievementList = data.Select(dict => new AchievementItem {
@@ -122,6 +122,18 @@ public class AchievementAllDataNotify {
                 FinishTimestamp = dict.GetValueOrDefault(tId),
             }).ToList()
         };
+        // ReSharper disable once ConvertIfStatementToSwitchStatement
+        static bool CheckKnownFieldIdIsValid(Dictionary<uint, uint> data) {
+            var info = GlobalVars.AchievementInfo;
+            var status = data.GetValueOrDefault(info.PbInfo.Status, 114514u);
+            if (status is 0 or > 3) {
+                return false;
+            }
+            if (status > 1 && data.GetValueOrDefault(info.PbInfo.FinishTimestamp) < 1600114514) { // 2020-09-15 04:15:14
+                return false;
+            }
+            return info.Items.ContainsKey(data.GetValueOrDefault(info.PbInfo.Id));
+        }
     }
 
 }
