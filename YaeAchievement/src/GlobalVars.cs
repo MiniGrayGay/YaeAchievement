@@ -15,8 +15,8 @@ public static class GlobalVars {
     public static readonly string CachePath = Path.Combine(DataPath, "cache");
     public static readonly string LibFilePath = Path.Combine(DataPath, "YaeAchievement.dll");
 
-    public const uint   AppVersionCode = 236;
-    public const string AppVersionName = "5.4";
+    public const uint   AppVersionCode = 237;
+    public const string AppVersionName = "5.5";
 
     public const string PipeName = "YaeAchievementPipe";
 
