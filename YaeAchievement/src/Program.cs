@@ -23,7 +23,19 @@ internal static class Program {
             AnsiConsole.WriteLine(App.AnotherInstance);
             Environment.Exit(302);
         }
-
+        SentrySdk.Init(options => {
+            options.Dsn = "https://92f11b64b0ef52cabc94f21df0428f5b@sentry.snapgenshin.com/9";
+#if DEBUG
+            options.Debug = true;
+#endif
+            options.TracesSampleRate = 1.0;
+            options.AutoSessionTracking = true;
+            options.SetBeforeSend(e => {
+                e.Release = GlobalVars.AppVersionName;
+                return e;
+            });
+            options.CacheDirectoryPath = GlobalVars.DataPath;
+        });
         InstallExitHook();
         InstallExceptionHook();
 

@@ -17,9 +17,9 @@ namespace YaeAchievement;
 
 public static class Utils {
 
-    public static HttpClient CHttpClient { get; } = new (new HttpClientHandler {
+    public static HttpClient CHttpClient { get; } = new (new SentryHttpMessageHandler(new HttpClientHandler {
         AutomaticDecompression = DecompressionMethods.Brotli | DecompressionMethods.GZip
-    }) {
+    })) {
         DefaultRequestHeaders = {
             UserAgent = {
                 new ProductInfoHeaderValue("YaeAchievement", GlobalVars.AppVersion.ToString(2))
@@ -28,20 +28,27 @@ public static class Utils {
     };
 
     public static async Task<byte[]> GetBucketFile(string path, bool useCache = true) {
+        var transaction = SentrySdk.StartTransaction(path, "bucket.get");
+        SentrySdk.ConfigureScope(scope => scope.Transaction = transaction);
         try {
-            return await GetFile("https://api.qhy04.com/hutaocdn/download?filename={0}", path, useCache);
+            var data = await GetFile("https://api.qhy04.com/hutaocdn/download?filename={0}", path, useCache);
+            transaction.Finish();
+            return data;
         } catch (Exception e) when (e is SocketException or TaskCanceledException or HttpRequestException) {
         }
         try {
-            return await Task.WhenAny(
+            var data = await Task.WhenAny(
                 GetFile("https://rin.holohat.work/{0}", path, useCache),
                 GetFile("https://cn-cd-1259389942.file.myqcloud.com/{0}", path, useCache)
             ).Unwrap();
+            transaction.Finish();
+            return data;
         } catch (Exception ex) when (ex is SocketException or TaskCanceledException) {
+            transaction.Finish();
             AnsiConsole.WriteLine(App.NetworkError, ex.Message);
             Environment.Exit(-1);
         }
-        return null!;
+        throw new UnreachableException();
         static async Task<byte[]> GetFile(string baseUrl, string objectKey, bool useCache) {
             using var reqwest = new HttpRequestMessage(HttpMethod.Get, string.Format(baseUrl, objectKey));
             CacheItem? cache = null;
@@ -180,6 +187,7 @@ public static class Utils {
     }
 
     public static void OnUnhandledException(Exception ex) {
+        SentrySdk.CaptureException(ex);
         switch (ex) {
             case ApplicationException ex1:
                 AnsiConsole.WriteLine(ex1.Message);

@@ -33,6 +33,7 @@ public static partial class AppConfig {
         GamePath = GetGamePathFromLogFile(logPath)
                    ?? GetGamePathFromLogFile($"{logPath}.last")
                    ?? throw new ApplicationException(App.ConfigNeedStartGenshin);
+        SentrySdk.AddBreadcrumb(GamePath.EndsWith("YuanShen.exe") ? "CN" : "OS", "GamePath");
     }
 
     private static string? GetGamePathFromLogFile(string path) {
