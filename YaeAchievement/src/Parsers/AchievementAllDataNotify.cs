@@ -62,7 +62,7 @@ public class AchievementAllDataNotify {
                             }
                             dict[tag >> 3] = eStream.ReadUInt32();
                         }
-                        if (dict != null) {
+                        if (dict is { Count: > 2 }) { // at least 3 fields
                             data.Add(dict);
                         }
                     } catch (InvalidProtocolBufferException) {

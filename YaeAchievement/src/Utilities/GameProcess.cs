@@ -37,14 +37,14 @@ public unsafe class GameProcess {
         Task.Run(() => {
             Native.WaitForSingleObject(Handle, 0xFFFFFFFF); // INFINITE
             OnExit?.Invoke();
-        });
+        }).ContinueWith(task => { if (task.IsFaulted) Utils.OnUnhandledException(task.Exception!); });
     }
 
     public void LoadLibrary(string libPath) {
         var hKrnl32 = NativeLibrary.Load("kernel32");
         var mLoadLibraryW = NativeLibrary.GetExport(hKrnl32, "LoadLibraryW");
         var libPathLen = (uint) libPath.Length * sizeof(char);
-        var lpLibPath = Native.VirtualAllocEx(Handle, default, libPathLen + 2, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+        var lpLibPath = Native.VirtualAllocEx(Handle, null, libPathLen + 2, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
         if (lpLibPath == null) {
             throw new ApplicationException($"VirtualAllocEx fail: {Marshal.GetLastPInvokeErrorMessage()}");
         }
@@ -54,7 +54,7 @@ public unsafe class GameProcess {
             }
         }
         var lpStartAddress = (delegate*unmanaged[Stdcall]<void*, uint>) mLoadLibraryW; // THREAD_START_ROUTINE
-        var hThread = Native.CreateRemoteThread(Handle, default, 0, lpStartAddress, lpLibPath, 0);
+        var hThread = Native.CreateRemoteThread(Handle, null, 0, lpStartAddress, lpLibPath, 0);
         if (hThread.IsNull) {
             var error = Marshal.GetLastPInvokeErrorMessage();
             Native.VirtualFreeEx(Handle, lpLibPath, 0, MEM_RELEASE);

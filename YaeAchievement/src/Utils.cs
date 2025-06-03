@@ -155,7 +155,7 @@ public static class Utils {
         var appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         foreach (var path in Directory.EnumerateDirectories($"{appdata}/../LocalLow/miHoYo").Where(p => File.Exists($"{p}/info.txt"))) {
             try {
-                using var handle = File.OpenHandle($"{path}/output_log.txt", share: FileShare.None);
+                using var handle = File.OpenHandle($"{path}/output_log.txt", share: FileShare.None, mode: FileMode.OpenOrCreate);
             } catch (IOException) {
                 AnsiConsole.WriteLine(App.GenshinIsRunning, 0);
                 Environment.Exit(301);
@@ -176,24 +176,25 @@ public static class Utils {
     }
 
     public static void InstallExceptionHook() {
-        AppDomain.CurrentDomain.UnhandledException += (_, e) => {
-            var ex = e.ExceptionObject;
-            switch (ex) {
-                case ApplicationException ex1:
-                    AnsiConsole.WriteLine(ex1.Message);
-                    break;
-                case SocketException ex2:
-                    AnsiConsole.WriteLine(App.ExceptionNetwork, nameof(SocketException), ex2.Message);
-                    break;
-                case HttpRequestException ex3:
-                    AnsiConsole.WriteLine(App.ExceptionNetwork, nameof(HttpRequestException), ex3.Message);
-                    break;
-                default:
-                    AnsiConsole.WriteLine(ex.ToString()!);
-                    break;
-            }
-            Environment.Exit(-1);
-        };
+        AppDomain.CurrentDomain.UnhandledException += (_, e) => OnUnhandledException((Exception) e.ExceptionObject);
+    }
+
+    public static void OnUnhandledException(Exception ex) {
+        switch (ex) {
+            case ApplicationException ex1:
+                AnsiConsole.WriteLine(ex1.Message);
+                break;
+            case SocketException ex2:
+                AnsiConsole.WriteLine(App.ExceptionNetwork, nameof(SocketException), ex2.Message);
+                break;
+            case HttpRequestException ex3:
+                AnsiConsole.WriteLine(App.ExceptionNetwork, nameof(HttpRequestException), ex3.Message);
+                break;
+            default:
+                AnsiConsole.WriteLine(ex.ToString());
+                break;
+        }
+        Environment.Exit(-1);
     }
 
     private static bool _isUnexpectedExit = true;
@@ -228,7 +229,7 @@ public static class Utils {
                     }
                 }
             }
-        });
+        }).ContinueWith(task => { if (task.IsFaulted) OnUnhandledException(task.Exception!); });
     }
 
     public static unsafe void SetQuickEditMode(bool enable) {
