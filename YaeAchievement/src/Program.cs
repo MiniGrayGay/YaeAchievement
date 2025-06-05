@@ -30,7 +30,11 @@ internal static class Program {
 #endif
             options.TracesSampleRate = 1.0;
             options.AutoSessionTracking = true;
-            options.SetBeforeSend(e => {
+            options.SetBeforeSend(static e => {
+                e.Release = GlobalVars.AppVersionName;
+                return e;
+            });
+            options.SetBeforeSendTransaction(static e => {
                 e.Release = GlobalVars.AppVersionName;
                 return e;
             });

@@ -160,7 +160,11 @@ public static class Utils {
     internal static void CheckGenshinIsRunning() {
         // QueryProcessEvent?
         var appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        foreach (var path in Directory.EnumerateDirectories($"{appdata}/../LocalLow/miHoYo").Where(p => File.Exists($"{p}/info.txt"))) {
+        var dataPath = $"{appdata}/../LocalLow/miHoYo";
+        if (!Directory.Exists(dataPath)) {
+            return;
+        }
+        foreach (var path in Directory.EnumerateDirectories(dataPath).Where(p => File.Exists($"{p}/info.txt"))) {
             try {
                 using var handle = File.OpenHandle($"{path}/output_log.txt", share: FileShare.None, mode: FileMode.OpenOrCreate);
             } catch (IOException) {
