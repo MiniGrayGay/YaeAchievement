@@ -14,7 +14,7 @@ public enum AchievementStatus {
     RewardTaken,
 }
 
-public class AchievementItem {
+public sealed class AchievementItem {
     
     public uint Id { get; init; }
     public uint TotalProgress { get; init; }
@@ -24,7 +24,7 @@ public class AchievementItem {
     
 }
 
-public class AchievementAllDataNotify {
+public sealed class AchievementAllDataNotify {
 
     public List<AchievementItem> AchievementList { get; private init; } = [];
     
@@ -144,7 +144,7 @@ public class AchievementAllDataNotify {
     GenerationMode = JsonSourceGenerationMode.Serialization,
     PropertyNamingPolicy = JsonKnownNamingPolicy.SnakeCaseLower
 )]
-public partial class AchievementRawDataSerializer : JsonSerializerContext {
+public sealed partial class AchievementRawDataSerializer : JsonSerializerContext {
 
     public static string Serialize(AchievementAllDataNotify ntf) {
         return JsonSerializer.Serialize(ntf, Default.AchievementAllDataNotify);

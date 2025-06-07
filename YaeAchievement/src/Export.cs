@@ -9,6 +9,7 @@ using Spectre.Console;
 using YaeAchievement.Outputs;
 using YaeAchievement.Parsers;
 using YaeAchievement.res;
+using YaeAchievement.Utilities;
 
 // ReSharper disable UnusedMember.Local
 
@@ -33,8 +34,8 @@ public static class Export {
         };
         Action<AchievementAllDataNotify> action;
         if (ExportTo == 114514) {
-            var prompt = new SelectionPrompt<string>().Title(App.ExportChoose).AddChoices(targets.Keys);
-            action = targets[AnsiConsole.Prompt(prompt)];
+            var prompt = new SelectionPromptCompat<string>().Title(App.ExportChoose).AddChoices(targets.Keys);
+            action = targets[prompt.Prompt()];
         } else {
             action = targets.ElementAtOrDefault(ExportTo).Value ?? ToCocogoat;
         }
@@ -210,7 +211,7 @@ public static class Export {
     }
 }
 
-public class WxApp1Root {
+public sealed class WxApp1Root {
 
     public string Key { get; init; } = null!;
 
@@ -223,7 +224,7 @@ public class WxApp1Root {
     GenerationMode = JsonSourceGenerationMode.Serialization,
     PropertyNamingPolicy = JsonKnownNamingPolicy.SnakeCaseLower
 )]
-public partial class WxApp1Serializer : JsonSerializerContext {
+public sealed partial class WxApp1Serializer : JsonSerializerContext {
 
     public static string Serialize(AchievementAllDataNotify ntf, string key) => JsonSerializer.Serialize(new WxApp1Root {
         Key = key,
@@ -231,8 +232,8 @@ public partial class WxApp1Serializer : JsonSerializerContext {
     }, Default.WxApp1Root);
 }
 
-public record CocogoatResponse(string Key);
+public sealed record CocogoatResponse(string Key);
 
 [JsonSerializable(typeof(CocogoatResponse))]
 [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
-public partial class CocogoatResponseContext : JsonSerializerContext;
+public sealed partial class CocogoatResponseContext : JsonSerializerContext;

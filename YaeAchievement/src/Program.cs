@@ -58,10 +58,10 @@ internal static class Program {
         } catch (Exception) { /* ignored */ }
 
         if (CacheFile.GetLastWriteTime("achievement_data").AddMinutes(60) > DateTime.UtcNow && data != null) {
-            var prompt = new SelectionPrompt<string>()
+            var prompt = new SelectionPromptCompat<string>()
                 .Title(App.UsePreviousData)
                 .AddChoices(App.CommonYes, App.CommonNo);
-            if (AnsiConsole.Prompt(prompt) == App.CommonYes) {
+            if (prompt.Prompt() == App.CommonYes) {
                 Export.Choose(data);
                 return;
             }
@@ -89,6 +89,7 @@ internal static class Program {
     internal static void SetupConsole() {
         SetQuickEditMode(false);
         Console.InputEncoding = Console.OutputEncoding = Encoding.UTF8;
+        FixTerminalFont();
     }
 
 }

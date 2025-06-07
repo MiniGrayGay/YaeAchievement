@@ -8,7 +8,7 @@ namespace YaeAchievement.Outputs;
 // ReSharper disable PropertyCanBeMadeInitOnly.Global
 #pragma warning disable CA1822 // ReSharper disable MemberCanBeMadeStatic.Global
 
-public class PaimonRoot {
+public sealed class PaimonRoot {
     
     public Dictionary<uint, Dictionary<uint, bool>> Achievement { get; set; } = null!;
 
@@ -29,7 +29,7 @@ public class PaimonRoot {
     GenerationMode = JsonSourceGenerationMode.Serialization,
     PropertyNamingPolicy = JsonKnownNamingPolicy.SnakeCaseLower
 )]
-public partial class PaimonSerializer : JsonSerializerContext {
+public sealed partial class PaimonSerializer : JsonSerializerContext {
 
     public static string Serialize(AchievementAllDataNotify ntf) {
         return JsonSerializer.Serialize(Outputs.PaimonRoot.FromNotify(ntf), Default.PaimonRoot);

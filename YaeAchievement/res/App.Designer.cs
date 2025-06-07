@@ -375,6 +375,42 @@ namespace YaeAchievement.res {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Use the keyboard arrow keys to move the cursor and the Enter key to select.
+        /// </summary>
+        internal static string SelectionPromptCompatAnsiTip {
+            get {
+                return ResourceManager.GetString("SelectionPromptCompatAnsiTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Choose an option:.
+        /// </summary>
+        internal static string SelectionPromptCompatChooseOne {
+            get {
+                return ResourceManager.GetString("SelectionPromptCompatChooseOne", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please enter a number between 0 and {0}.
+        /// </summary>
+        internal static string SelectionPromptCompatInvalidChoice {
+            get {
+                return ResourceManager.GetString("SelectionPromptCompatInvalidChoice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type a number and press Enter to select.
+        /// </summary>
+        internal static string SelectionPromptCompatNonAnsiTip {
+            get {
+                return ResourceManager.GetString("SelectionPromptCompatNonAnsiTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Reward not taken.
         /// </summary>
         internal static string StatusFinished {

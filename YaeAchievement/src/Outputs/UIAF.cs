@@ -9,7 +9,7 @@ namespace YaeAchievement.Outputs;
 // ReSharper disable PropertyCanBeMadeInitOnly.Global
 #pragma warning disable CA1822 // ReSharper disable MemberCanBeMadeStatic.Global
 
-public class UApplicationInfo {
+public sealed class UApplicationInfo {
 
     public string ExportApp => "YaeAchievement";
 
@@ -21,7 +21,7 @@ public class UApplicationInfo {
 
 }
 
-public class UAchievementInfo {
+public sealed class UAchievementInfo {
 
     public uint Id { get; set; }
 
@@ -33,7 +33,7 @@ public class UAchievementInfo {
 
 }
 
-public class UIAFRoot {
+public sealed class UIAFRoot {
 
     public UApplicationInfo Info => new ();
 
@@ -57,7 +57,7 @@ public class UIAFRoot {
     GenerationMode = JsonSourceGenerationMode.Serialization,
     PropertyNamingPolicy = JsonKnownNamingPolicy.SnakeCaseLower
 )]
-public partial class UIAFSerializer : JsonSerializerContext {
+public sealed partial class UIAFSerializer : JsonSerializerContext {
 
     public static string Serialize(AchievementAllDataNotify ntf) {
         return JsonSerializer.Serialize(Outputs.UIAFRoot.FromNotify(ntf), Default.UIAFRoot);

@@ -8,9 +8,9 @@ namespace YaeAchievement.Outputs;
 // ReSharper disable PropertyCanBeMadeInitOnly.Global
 #pragma warning disable CA1822 // ReSharper disable MemberCanBeMadeStatic.Global
 
-public class SeelieRoot {
+public sealed class SeelieRoot {
     
-    public class AchievementFinishStatus {
+    public sealed class AchievementFinishStatus {
 
         public bool Done => true;
 
@@ -31,7 +31,7 @@ public class SeelieRoot {
     GenerationMode = JsonSourceGenerationMode.Serialization,
     PropertyNamingPolicy = JsonKnownNamingPolicy.SnakeCaseLower
 )]
-public partial class SeelieSerializer : JsonSerializerContext {
+public sealed partial class SeelieSerializer : JsonSerializerContext {
 
     public static string Serialize(AchievementAllDataNotify ntf) {
         return JsonSerializer.Serialize(Outputs.SeelieRoot.FromNotify(ntf), Default.SeelieRoot);

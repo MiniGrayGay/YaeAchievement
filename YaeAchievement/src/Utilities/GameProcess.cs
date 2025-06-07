@@ -11,7 +11,7 @@ using static Windows.Win32.System.Memory.VIRTUAL_FREE_TYPE;
 
 namespace YaeAchievement.Utilities;
 
-public unsafe class GameProcess {
+public sealed unsafe class GameProcess {
 
     public uint Id { get; }
 

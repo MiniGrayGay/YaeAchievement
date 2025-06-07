@@ -9,7 +9,7 @@ using Spectre.Console;
 
 namespace YaeAchievement.Parsers;
 
-public class PlayerStoreNotify {
+public sealed class PlayerStoreNotify {
 
     public uint WeightLimit { get; set; }
 

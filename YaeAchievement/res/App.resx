@@ -163,4 +163,16 @@
     <data name="ExportTargetWxApp1" xml:space="preserve">
         <value />
     </data>
+    <data name="SelectionPromptCompatChooseOne" xml:space="preserve">
+        <value>Choose an option:</value>
+    </data>
+    <data name="SelectionPromptCompatAnsiTip" xml:space="preserve">
+        <value>Use the keyboard arrow keys to move the cursor and the Enter key to select</value>
+    </data>
+    <data name="SelectionPromptCompatNonAnsiTip" xml:space="preserve">
+        <value>Type a number and press Enter to select</value>
+    </data>
+    <data name="SelectionPromptCompatInvalidChoice" xml:space="preserve">
+        <value>Please enter a number between 0 and {0}</value>
+    </data>
 </root>

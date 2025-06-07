@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO.Pipes;
 using System.Net;
 using System.Net.Http.Headers;
@@ -244,11 +245,27 @@ public static class Utils {
         }).ContinueWith(task => { if (task.IsFaulted) OnUnhandledException(task.Exception!); });
     }
 
-    public static unsafe void SetQuickEditMode(bool enable) {
+    internal static unsafe void SetQuickEditMode(bool enable) {
         var handle = Native.GetStdHandle(STD_HANDLE.STD_INPUT_HANDLE);
         CONSOLE_MODE mode = default;
         Native.GetConsoleMode(handle, &mode);
         mode = enable ? mode | CONSOLE_MODE.ENABLE_QUICK_EDIT_MODE : mode &~CONSOLE_MODE.ENABLE_QUICK_EDIT_MODE;
         Native.SetConsoleMode(handle, mode);
+    }
+
+    internal static unsafe void FixTerminalFont() {
+        if (!CultureInfo.CurrentCulture.Name.StartsWith("zh")) {
+            return;
+        }
+        var handle = Native.GetStdHandle(STD_HANDLE.STD_OUTPUT_HANDLE);
+        var fontInfo = new CONSOLE_FONT_INFOEX {
+            cbSize = (uint) sizeof(CONSOLE_FONT_INFOEX)
+        };
+        if (!Native.GetCurrentConsoleFontEx(handle, false, &fontInfo)) {
+            return;
+        }
+        if (fontInfo.FaceName.ToString() == "Terminal") { // 点阵字体
+            CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo("en-US"); // todo: use better way like auto set console font etc.
+        }
     }
 }

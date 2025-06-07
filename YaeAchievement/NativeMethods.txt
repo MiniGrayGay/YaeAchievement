@@ -19,3 +19,5 @@ VirtualAllocEx
 VirtualFreeEx
 WaitForSingleObject
 WriteProcessMemory
+
+GetCurrentConsoleFontEx

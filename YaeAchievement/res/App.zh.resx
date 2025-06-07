@@ -18,7 +18,7 @@
         <value>全部成就</value>
     </data>
     <data name="ExportChoose" xml:space="preserve">
-        <value>要导出到哪里？（键盘上下键移动光标，键盘回车键选择）</value>
+        <value>要导出到哪里？</value>
     </data>
     <data name="ExportToCocogoatSuccess" xml:space="preserve">
         <value>在浏览器内进行下一步操作</value>
@@ -91,7 +91,7 @@
         <value>YaeAchievement - 原神成就导出工具 ({0})</value>
     </data>
     <data name="UsePreviousData" xml:space="preserve">
-        <value>要使用上一次获取到的成就数据吗？（键盘上下键移动光标，键盘回车键选择）</value>
+        <value>要使用上一次获取到的成就数据吗？</value>
     </data>
     <data name="NetworkError" xml:space="preserve">
         <value>网络错误: {0}</value>
@@ -155,5 +155,17 @@
     </data>
     <data name="ExportTargetWxApp1" xml:space="preserve">
         <value>原魔工具箱</value>
+    </data>
+    <data name="SelectionPromptCompatChooseOne" xml:space="preserve">
+        <value>选择一个选项：</value>
+    </data>
+    <data name="SelectionPromptCompatAnsiTip" xml:space="preserve">
+        <value>键盘上下键移动光标，键盘回车键选择</value>
+    </data>
+    <data name="SelectionPromptCompatNonAnsiTip" xml:space="preserve">
+        <value>输入数字并回车以选择选项</value>
+    </data>
+    <data name="SelectionPromptCompatInvalidChoice" xml:space="preserve">
+        <value>请输入 0 到 {0} 之间的数字</value>
     </data>
 </root>
