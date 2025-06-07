@@ -1,5 +1,4 @@
 ﻿using Spectre.Console;
-using YaeAchievement.res;
 
 namespace YaeAchievement.Utilities;
 

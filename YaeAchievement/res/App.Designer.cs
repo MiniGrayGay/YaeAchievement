@@ -447,6 +447,15 @@ namespace YaeAchievement.res {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An error occurred while reading the data. Please try again..
+        /// </summary>
+        internal static string StreamReadDataFail {
+            get {
+                return ResourceManager.GetString("StreamReadDataFail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Checking update....
         /// </summary>
         internal static string UpdateChecking {
@@ -471,6 +480,15 @@ namespace YaeAchievement.res {
         internal static string UpdateDownloading {
             get {
                 return ResourceManager.GetString("UpdateDownloading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The process cannot access the file &apos;{0}&apos; because it is being used by another process. Please restart your computer and try again..
+        /// </summary>
+        internal static string UpdateFileShareViolation {
+            get {
+                return ResourceManager.GetString("UpdateFileShareViolation", resourceCulture);
             }
         }
         

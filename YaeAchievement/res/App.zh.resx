@@ -168,4 +168,10 @@
     <data name="SelectionPromptCompatInvalidChoice" xml:space="preserve">
         <value>请输入 0 到 {0} 之间的数字</value>
     </data>
+    <data name="StreamReadDataFail" xml:space="preserve">
+        <value>读取数据时发生错误，请重试</value>
+    </data>
+    <data name="UpdateFileShareViolation" xml:space="preserve">
+        <value>文件 {0} 被其它程序占用，请 重启电脑 或 解除文件占用 后重试。</value>
+    </data>
 </root>

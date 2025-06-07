@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using System.Diagnostics;
 using System.Net;
 using System.Text;
 using System.Text.Json;
@@ -8,7 +7,6 @@ using Microsoft.Win32;
 using Spectre.Console;
 using YaeAchievement.Outputs;
 using YaeAchievement.Parsers;
-using YaeAchievement.res;
 using YaeAchievement.Utilities;
 
 // ReSharper disable UnusedMember.Local

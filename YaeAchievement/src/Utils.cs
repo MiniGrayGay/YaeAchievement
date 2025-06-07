@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO.Pipes;
 using System.Net;
@@ -11,7 +10,6 @@ using Windows.Win32.Foundation;
 using Windows.Win32.System.Console;
 using Proto;
 using Spectre.Console;
-using YaeAchievement.res;
 using YaeAchievement.Utilities;
 
 namespace YaeAchievement;
@@ -109,35 +107,42 @@ public static class Utils {
     }
 
     public static async Task CheckUpdate(bool useLocalLib) {
-        var versionData = await StartSpinnerAsync(App.UpdateChecking, _ => GetBucketFile("schicksal/version"));
-        var versionInfo = UpdateInfo.Parser.ParseFrom(versionData)!;
-        if (GlobalVars.AppVersionCode < versionInfo.VersionCode) {
-            AnsiConsole.WriteLine(App.UpdateNewVersion, GlobalVars.AppVersionName, versionInfo.VersionName);
-            AnsiConsole.WriteLine(App.UpdateDescription, versionInfo.Description);
-            if (versionInfo.EnableAutoUpdate) {
-                var newBin = await StartSpinnerAsync(App.UpdateDownloading, _ => GetBucketFile(versionInfo.PackageLink));
-                var tmpPath = Path.GetTempFileName();
-                var updaterPath = Path.Combine(GlobalVars.DataPath, "update.exe");
-                await using (var dstStream = File.Open($"{GlobalVars.DataPath}/update.exe", FileMode.Create)) {
-                    await using var srcStream = typeof(Program).Assembly.GetManifestResourceStream("updater")!;
-                    await srcStream.CopyToAsync(dstStream);
+        try {
+            var versionData = await StartSpinnerAsync(App.UpdateChecking, _ => GetBucketFile("schicksal/version"));
+            var versionInfo = UpdateInfo.Parser.ParseFrom(versionData)!;
+            if (GlobalVars.AppVersionCode < versionInfo.VersionCode) {
+                AnsiConsole.WriteLine(App.UpdateNewVersion, GlobalVars.AppVersionName, versionInfo.VersionName);
+                AnsiConsole.WriteLine(App.UpdateDescription, versionInfo.Description);
+                if (versionInfo.EnableAutoUpdate) {
+                    var newBin = await StartSpinnerAsync(App.UpdateDownloading, _ => GetBucketFile(versionInfo.PackageLink));
+                    var tmpPath = Path.GetTempFileName();
+                    var updaterPath = Path.Combine(GlobalVars.DataPath, "update.exe");
+                    await using (var dstStream = File.Open($"{GlobalVars.DataPath}/update.exe", FileMode.Create)) {
+                        await using var srcStream = typeof(Program).Assembly.GetManifestResourceStream("updater")!;
+                        await srcStream.CopyToAsync(dstStream);
+                    }
+                    await File.WriteAllBytesAsync(tmpPath, newBin);
+                    ShellOpen(updaterPath, $"{Environment.ProcessId} \"{tmpPath}\"");
+                    await StartSpinnerAsync(App.UpdateChecking, _ => Task.Delay(1919810));
+                    GlobalVars.PauseOnExit = false;
+                    Environment.Exit(0);
                 }
-                await File.WriteAllBytesAsync(tmpPath, newBin);
-                ShellOpen(updaterPath, $"{Environment.ProcessId} \"{tmpPath}\"");
-                await StartSpinnerAsync(App.UpdateChecking, _ => Task.Delay(1919810));
-                GlobalVars.PauseOnExit = false;
-                Environment.Exit(0);
+                AnsiConsole.MarkupLine($"[link]{App.DownloadLink}[/]", versionInfo.PackageLink);
+                if (versionInfo.ForceUpdate) {
+                    Environment.Exit(0);
+                }
             }
-            AnsiConsole.MarkupLine($"[link]{App.DownloadLink}[/]", versionInfo.PackageLink);
-            if (versionInfo.ForceUpdate) {
-                Environment.Exit(0);
+            if (versionInfo.EnableLibDownload && !useLocalLib) {
+                var data = await GetBucketFile("schicksal/lic.dll");
+                await File.WriteAllBytesAsync(GlobalVars.LibFilePath, data); // 要求重启电脑
             }
+            _updateInfo = versionInfo;
+        } catch (IOException e) when ((uint) e.HResult == 0x80070020) { // ERROR_SHARING_VIOLATION
+            // IO_SharingViolation_File
+            // The process cannot access the file '{0}' because it is being used by another process.
+            AnsiConsole.WriteLine("文件 {0} 被其它程序占用，请 重启电脑 或 解除文件占用 后重试。", e.Message[36..^46]);
+            Environment.Exit(-1);
         }
-        if (versionInfo.EnableLibDownload && !useLocalLib) {
-            var data = await GetBucketFile("schicksal/lic.dll");
-            await File.WriteAllBytesAsync(GlobalVars.LibFilePath, data);
-        }
-        _updateInfo = versionInfo;
     }
 
     // ReSharper disable once UnusedMethodReturnValue.Global

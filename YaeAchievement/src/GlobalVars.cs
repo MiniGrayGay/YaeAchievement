@@ -1,4 +1,7 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿global using System.Diagnostics;
+global using YaeAchievement.res;
+
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Proto;
 

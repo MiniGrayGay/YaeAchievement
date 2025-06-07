@@ -29,7 +29,16 @@ public sealed unsafe class GameProcess {
         };
         var wd = Path.GetDirectoryName(path)!;
         if (!Native.CreateProcess(path, ref cmdLines, null, null, false, flags, null, wd, si, out var pi)) {
-            throw new ApplicationException($"CreateProcess fail: {Marshal.GetLastPInvokeErrorMessage()}");
+            var argumentData = new Dictionary<string, object> {
+                { "path", path },
+                { "workdir", wd },
+                { "file_exists", File.Exists(path) },
+            };
+            throw new ApplicationException($"CreateProcess fail: {Marshal.GetLastPInvokeErrorMessage()}") {
+                Data = {
+                    { "sentry:context:Arguments", argumentData }
+                }
+            };
         }
         Id = pi.dwProcessId;
         Handle = pi.hProcess;

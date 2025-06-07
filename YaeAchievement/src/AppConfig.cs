@@ -1,5 +1,5 @@
 ﻿using System.Text.RegularExpressions;
-using YaeAchievement.res;
+using Spectre.Console;
 using YaeAchievement.Utilities;
 
 namespace YaeAchievement;
@@ -28,11 +28,15 @@ public static partial class AppConfig {
             .Where(File.Exists)
             .MaxBy(File.GetLastWriteTime);
         if (logPath == null) {
-            throw new ApplicationException(App.ConfigNeedStartGenshin);
+            AnsiConsole.WriteLine(App.ConfigNeedStartGenshin);
+            Environment.Exit(-1);
         }
-        GamePath = GetGamePathFromLogFile(logPath)
-                   ?? GetGamePathFromLogFile($"{logPath}.last")
-                   ?? throw new ApplicationException(App.ConfigNeedStartGenshin);
+        var gamePath = GetGamePathFromLogFile(logPath) ?? GetGamePathFromLogFile($"{logPath}.last");
+        if (gamePath == null) {
+            AnsiConsole.WriteLine(App.ConfigNeedStartGenshin);
+            Environment.Exit(-1);
+        }
+        GamePath = gamePath;
         SentrySdk.AddBreadcrumb(GamePath.EndsWith("YuanShen.exe") ? "CN" : "OS", "GamePath");
     }
 

@@ -2,7 +2,6 @@
 using System.Text;
 using Spectre.Console;
 using YaeAchievement.Parsers;
-using YaeAchievement.res;
 using YaeAchievement.Utilities;
 using static YaeAchievement.Utils;
 

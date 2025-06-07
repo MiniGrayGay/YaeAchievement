@@ -2,7 +2,6 @@
 using System.Text.Json.Serialization;
 using Google.Protobuf;
 using Spectre.Console;
-using YaeAchievement.res;
 using YaeAchievement.Utilities;
 
 namespace YaeAchievement.Parsers;
@@ -31,7 +30,7 @@ public sealed class AchievementAllDataNotify {
     private static AchievementAllDataNotify? Instance { get; set; }
 
     public static bool OnReceive(BinaryReader reader) {
-        var bytes = reader.ReadBytes(reader.ReadInt32());
+        var bytes = reader.ReadBytes();
         CacheFile.Write("achievement_data", bytes);
         Instance = ParseFrom(bytes);
         return true;
