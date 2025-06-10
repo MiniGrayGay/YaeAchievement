@@ -21,3 +21,6 @@ WaitForSingleObject
 WriteProcessMemory
 
 GetCurrentConsoleFontEx
+
+OpenProcess
+GetModuleFileNameEx

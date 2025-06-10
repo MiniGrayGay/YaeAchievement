@@ -1,4 +1,7 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.RegularExpressions;
 using Spectre.Console;
 using YaeAchievement.Utilities;
 
@@ -13,31 +16,66 @@ public static partial class AppConfig {
     internal static void Load(string argumentPath) {
         if (argumentPath != "auto" && File.Exists(argumentPath)) {
             GamePath = argumentPath;
-            return;
+        } else if (TryReadGamePathFromCache(out var cachedPath)) {
+            GamePath = cachedPath;
+        } else if (TryReadGamePathFromUnityLog(out var loggedPath)) {
+            GamePath = loggedPath;
+        } else {
+            GamePath = ReadGamePathFromProcess();
         }
-        if (CacheFile.TryRead("genshin_impact_game_path", out var cache)) {
-            var path = cache.Content.ToStringUtf8();
-            if (path != null && File.Exists(path)) {
-                GamePath = path;
-                return;
+        Span<byte> buffer = stackalloc byte[0x10000];
+        using var stream = File.OpenRead(GamePath);
+        if (stream.Read(buffer) == buffer.Length) {
+            var hash = Convert.ToHexString(MD5.HashData(buffer));
+            CacheFile.Write("genshin_impact_game_path_v2", Encoding.UTF8.GetBytes($"{GamePath}\u1145{hash}"));
+        }
+        SentrySdk.AddBreadcrumb(GamePath.EndsWith("YuanShen.exe") ? "CN" : "OS", "GamePath");
+        return;
+        static bool TryReadGamePathFromCache([NotNullWhen(true)] out string? path) {
+            path = null;
+            try {
+                if (!CacheFile.TryRead("genshin_impact_game_path_v2", out var cacheFile)) {
+                    return false;
+                }
+                var cacheData = cacheFile.Content.ToStringUtf8().Split("\u1145");
+                Span<byte> buffer = stackalloc byte[0x10000];
+                using var stream = File.OpenRead(cacheData[0]);
+                if (stream.Read(buffer) != buffer.Length || Convert.ToHexString(MD5.HashData(buffer)) != cacheData[1]) {
+                    return false;
+                }
+                path = cacheData[0];
+                return true;
+            } catch (Exception) {
+                return false;
             }
         }
-        var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        var logPath = ProductNames
-            .Select(name => $"{appDataPath}/../LocalLow/miHoYo/{name}/output_log.txt")
-            .Where(File.Exists)
-            .MaxBy(File.GetLastWriteTime);
-        if (logPath == null) {
-            AnsiConsole.WriteLine(App.ConfigNeedStartGenshin);
-            Environment.Exit(-1);
+        static bool TryReadGamePathFromUnityLog([NotNullWhen(true)] out string? path) {
+            path = null;
+            try {
+                var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                var logPath = ProductNames
+                    .Select(name => $"{appDataPath}/../LocalLow/miHoYo/{name}/output_log.txt")
+                    .Where(File.Exists)
+                    .MaxBy(File.GetLastWriteTime);
+                if (logPath == null) {
+                    return false;
+                }
+                return (path = GetGamePathFromLogFile(logPath) ?? GetGamePathFromLogFile($"{logPath}.last")) != null;
+            } catch (Exception) {
+                return false;
+            }
         }
-        var gamePath = GetGamePathFromLogFile(logPath) ?? GetGamePathFromLogFile($"{logPath}.last");
-        if (gamePath == null) {
-            AnsiConsole.WriteLine(App.ConfigNeedStartGenshin);
-            Environment.Exit(-1);
+        static string ReadGamePathFromProcess() {
+            return AnsiConsole.Status().Spinner(Spinner.Known.SimpleDotsScrolling).Start(App.ConfigNeedStartGenshin, _ => {
+                Process? proc;
+                while ((proc = Utils.GetGameProcess()) == null) {
+                    Thread.Sleep(250);
+                }
+                var fileName = proc.GetFileName()!;
+                proc.Kill();
+                return fileName;
+            });
         }
-        GamePath = gamePath;
-        SentrySdk.AddBreadcrumb(GamePath.EndsWith("YuanShen.exe") ? "CN" : "OS", "GamePath");
     }
 
     private static string? GetGamePathFromLogFile(string path) {

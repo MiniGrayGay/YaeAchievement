@@ -61,7 +61,7 @@
         <value>Reward not taken</value>
     </data>
     <data name="ConfigNeedStartGenshin" xml:space="preserve">
-        <value>You need to login genshin impact before exporting.</value>
+        <value>Please launch GenshinImpact to continue.</value>
     </data>
     <data name="DownloadLink" xml:space="preserve">
         <value>Download: {0}</value>

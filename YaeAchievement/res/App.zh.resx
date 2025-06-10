@@ -54,7 +54,7 @@
         <value>已完成</value>
     </data>
     <data name="ConfigNeedStartGenshin" xml:space="preserve">
-        <value>在导出前你需要先完成一次登入流程.</value>
+        <value>请打开 原神 后继续操作</value>
     </data>
     <data name="DownloadLink" xml:space="preserve">
         <value>下载地址: {0}</value>

@@ -163,22 +163,9 @@ public static class Utils {
         }
     }
 
-    internal static void CheckGenshinIsRunning() {
-        // QueryProcessEvent?
-        var appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        var dataPath = $"{appdata}/../LocalLow/miHoYo";
-        if (!Directory.Exists(dataPath)) {
-            return;
-        }
-        foreach (var path in Directory.EnumerateDirectories(dataPath).Where(p => File.Exists($"{p}/info.txt"))) {
-            try {
-                using var handle = File.OpenHandle($"{path}/output_log.txt", share: FileShare.None, mode: FileMode.OpenOrCreate);
-            } catch (IOException) {
-                AnsiConsole.WriteLine(App.GenshinIsRunning, 0);
-                Environment.Exit(301);
-            }
-        }
-    }
+    internal static Process? GetGameProcess() => Process.GetProcessesByName("YuanShen")
+        .Concat(Process.GetProcessesByName("GenshinImpact"))
+        .FirstOrDefault(p => File.Exists($"{p.GetFileName()}/../HoYoKProtect.sys"));
 
     private static GameProcess? _proc;
 

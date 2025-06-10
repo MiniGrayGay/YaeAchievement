@@ -105,7 +105,7 @@ namespace YaeAchievement.res {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You need to login genshin impact before exporting..
+        ///   Looks up a localized string similar to Please launch GenshinImpact to continue..
         /// </summary>
         internal static string ConfigNeedStartGenshin {
             get {

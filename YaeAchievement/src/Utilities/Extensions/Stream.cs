@@ -1,10 +1,12 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Spectre.Console;
 
 // ReSharper disable CheckNamespace
 
 namespace Google.Protobuf;
 
+[EditorBrowsable(EditorBrowsableState.Never)]
 internal static class BinaryReaderExtensions {
 
     public static byte[] ReadBytes(this BinaryReader reader) {
@@ -23,6 +25,7 @@ internal static class BinaryReaderExtensions {
 
 }
 
+[EditorBrowsable(EditorBrowsableState.Never)]
 internal static class CodedInputStreamExtensions {
 
     [UnsafeAccessor(UnsafeAccessorKind.Method)]
