@@ -42,7 +42,7 @@ public static class Utils {
             ).Unwrap();
             transaction.Finish();
             return data;
-        } catch (Exception ex) when (ex is SocketException or TaskCanceledException) {
+        } catch (Exception ex) when (ex is HttpRequestException or SocketException or TaskCanceledException) {
             transaction.Finish();
             AnsiConsole.WriteLine(App.NetworkError, ex.Message);
             Environment.Exit(-1);
