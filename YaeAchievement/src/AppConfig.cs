@@ -88,7 +88,8 @@ public static partial class AppConfig {
             return null;
         }
         var entryName = matchResult.Groups["1"].Value.Replace("_Data", ".exe");
-        return Path.GetFullPath(Path.Combine(matchResult.Value, "..", entryName));
+        var fullPath = Path.GetFullPath(Path.Combine(matchResult.Value, "..", entryName));
+        return File.Exists(fullPath) ? fullPath : null;
     }
 
     [GeneratedRegex(@"(?m).:(?:\\|/).+(GenshinImpact_Data|YuanShen_Data)", RegexOptions.IgnoreCase)]
