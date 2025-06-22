@@ -348,6 +348,15 @@ namespace YaeAchievement.res {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Load failed. Please retry. ({0} {1} {2}).
+        /// </summary>
+        internal static string LoadLibraryFail {
+            get {
+                return ResourceManager.GetString("LoadLibraryFail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Network error:.
         /// </summary>
         internal static string NetworkError {

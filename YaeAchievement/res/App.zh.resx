@@ -174,4 +174,7 @@
     <data name="UpdateFileShareViolation" xml:space="preserve">
         <value>文件 {0} 被其它程序占用，请 重启电脑 或 解除文件占用 后重试。</value>
     </data>
+    <data name="LoadLibraryFail" xml:space="preserve">
+        <value>加载失败，请重试（{0} {1} {2}）</value>
+    </data>
 </root>

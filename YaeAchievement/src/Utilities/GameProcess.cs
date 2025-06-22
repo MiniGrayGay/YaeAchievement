@@ -1,8 +1,9 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.ComponentModel;
+using System.Runtime.InteropServices;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.System.Threading;
-
+using Spectre.Console;
 using static Windows.Win32.System.Memory.VIRTUAL_ALLOCATION_TYPE;
 using static Windows.Win32.System.Memory.PAGE_PROTECTION_FLAGS;
 using static Windows.Win32.System.Memory.VIRTUAL_FREE_TYPE;
@@ -50,29 +51,33 @@ public sealed unsafe class GameProcess {
     }
 
     public void LoadLibrary(string libPath) {
-        var hKrnl32 = NativeLibrary.Load("kernel32");
-        var mLoadLibraryW = NativeLibrary.GetExport(hKrnl32, "LoadLibraryW");
-        var libPathLen = (uint) libPath.Length * sizeof(char);
-        var lpLibPath = Native.VirtualAllocEx(Handle, null, libPathLen + 2, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
-        if (lpLibPath == null) {
-            throw new ApplicationException($"VirtualAllocEx fail: {Marshal.GetLastPInvokeErrorMessage()}");
-        }
-        fixed (void* lpBuffer = libPath) {
-            if (!Native.WriteProcessMemory(Handle, lpLibPath, lpBuffer, libPathLen)) {
-                throw new ApplicationException($"WriteProcessMemory fail: {Marshal.GetLastPInvokeErrorMessage()}");
+        try {
+            var hKrnl32 = NativeLibrary.Load("kernel32");
+            var mLoadLibraryW = NativeLibrary.GetExport(hKrnl32, "LoadLibraryW");
+            var libPathLen = (uint) libPath.Length * sizeof(char);
+            var lpLibPath = Native.VirtualAllocEx(Handle, null, libPathLen + 2, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+            if (lpLibPath == null) {
+                throw new Win32Exception { Data = { { "api", "VirtualAllocEx" } } };
             }
+            fixed (void* lpBuffer = libPath) {
+                if (!Native.WriteProcessMemory(Handle, lpLibPath, lpBuffer, libPathLen)) {
+                    throw new Win32Exception { Data = { { "api", "WriteProcessMemory" } } };
+                }
+            }
+            var lpStartAddress = (delegate*unmanaged[Stdcall]<void*, uint>) mLoadLibraryW; // THREAD_START_ROUTINE
+            var hThread = Native.CreateRemoteThread(Handle, null, 0, lpStartAddress, lpLibPath, 0);
+            if (hThread.IsNull) {
+                throw new Win32Exception { Data = { { "api", "CreateRemoteThread" } } };
+            }
+            if (Native.WaitForSingleObject(hThread, 2000) == 0) {
+                Native.VirtualFreeEx(Handle, lpLibPath, 0, MEM_RELEASE);
+            }
+            Native.CloseHandle(hThread);
+        } catch (Win32Exception e) {
+            _ = Terminate(0);
+            AnsiConsole.WriteLine(App.LoadLibraryFail, e.Data["api"]!, e.NativeErrorCode, e.Message);
+            Environment.Exit(-1);
         }
-        var lpStartAddress = (delegate*unmanaged[Stdcall]<void*, uint>) mLoadLibraryW; // THREAD_START_ROUTINE
-        var hThread = Native.CreateRemoteThread(Handle, null, 0, lpStartAddress, lpLibPath, 0);
-        if (hThread.IsNull) {
-            var error = Marshal.GetLastPInvokeErrorMessage();
-            Native.VirtualFreeEx(Handle, lpLibPath, 0, MEM_RELEASE);
-            throw new ApplicationException($"CreateRemoteThread fail: {error}");
-        }
-        if (Native.WaitForSingleObject(hThread, 2000) == 0) {
-            Native.VirtualFreeEx(Handle, lpLibPath, 0, MEM_RELEASE);
-        }
-        Native.CloseHandle(hThread);
     }
 
     public bool ResumeMainThread() => Native.ResumeThread(MainThreadHandle) != 0xFFFFFFFF;

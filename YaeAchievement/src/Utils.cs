@@ -207,6 +207,8 @@ public static class Utils {
     // ReSharper disable once UnusedMethodReturnValue.Global
     public static void StartAndWaitResult(string exePath, Dictionary<int, Func<BinaryReader, bool>> handlers, Action onFinish) {
         _proc = new GameProcess(exePath);
+        _proc.LoadLibrary(GlobalVars.LibFilePath);
+        _proc.ResumeMainThread();
         _proc.OnExit += () => {
             if (_isUnexpectedExit) {
                 _proc = null;
@@ -214,8 +216,6 @@ public static class Utils {
                 Environment.Exit(114514);
             }
         };
-        _proc.LoadLibrary(GlobalVars.LibFilePath);
-        _proc.ResumeMainThread();
         AnsiConsole.WriteLine(App.GameLoading, _proc.Id);
         Task.Run(() => {
             using var stream = new NamedPipeServerStream(GlobalVars.PipeName);
